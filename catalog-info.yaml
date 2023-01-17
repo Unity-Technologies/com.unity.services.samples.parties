@@ -1,0 +1,16 @@
+# For more information about the available options please visit: http://go/backstage (VPN required)
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  annotations:
+    github.com/project-slug: Unity-Technologies/com.unity.services.samples.parties
+  name: com.unity.services.samples.parties
+  description: "A Unity project containing assets and code creating a Game Party experience using the Lobby Service."
+  labels:
+    costcenter: "5111"
+  tags:
+    - planned-public
+spec:
+  type: other
+  lifecycle: pre-production
+  owner: unity-technologies/mtt-samples-eng
