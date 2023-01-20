@@ -8,10 +8,10 @@ namespace Unity.Services.Samples.Parties
         [field: SerializeField] public PartyInfoView PartyInfoView { get; private set; }
         [field: SerializeField] public PartyListView PartyListView { get; private set; }
 
-        public void Init()
+        public void Init(int maxPartysize)
         {
             PartyInfoView.Init();
-            PartyListView.Init();
+            PartyListView.Init(maxPartysize);
         }
     }
 }

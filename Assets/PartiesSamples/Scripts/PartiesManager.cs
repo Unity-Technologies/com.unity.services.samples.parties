@@ -21,6 +21,7 @@ namespace Unity.Services.Samples.Parties
 
         Lobby m_PartyLobby;
         PartyPlayer m_LocalPlayer;
+        LobbyEventCallbacks m_PartyEventCallbacks;
 
         async void Start()
         {
@@ -45,7 +46,7 @@ namespace Unity.Services.Samples.Parties
 
         void UIInit()
         {
-            m_PartiesViewUGUI.Init();
+            m_PartiesViewUGUI.Init(k_MaxPartyMembers);
 
             //Party Info
             m_PartyInfoView = m_PartiesViewUGUI.PartyInfoView;
@@ -71,7 +72,7 @@ namespace Unity.Services.Samples.Parties
                 var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
                 m_PartyLobby =
                     await LobbyService.Instance.CreateLobbyAsync(partyLobbyName, k_MaxPartyMembers, partyLobbyOptions);
-                OnJoinedLobby(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -84,7 +85,7 @@ namespace Unity.Services.Samples.Parties
             try
             {
                 m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode);
-                OnJoinedLobby(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -102,34 +103,71 @@ namespace Unity.Services.Samples.Parties
             {
                 Debug.Log(e);
             }
+
             //Leave Lobby Regardless of call
-            OnLeftLobby();
+            OnLeaveParty();
         }
 
-        void OnJoinedLobby(Lobby lobby)
+        async Task OnJoinedLobby(Lobby lobby)
         {
             m_PartyInfoView.JoinParty(lobby.LobbyCode);
 
             UpdatePlayers(lobby.Players, lobby.HostId);
 
             //Subscribe to lobby updates
-        }
-
-        void OnLeftLobby()
-        {
-            m_PartyInfoView.LeftParty();
-            m_PartyListView.Clear();
+            await SubscribeToPartyEvents(lobby.Id);
         }
 
         void UpdatePlayers(List<Player> players, string hostID)
         {
+            var partyPlayers = new List<PartyPlayer>();
             foreach (var player in players)
             {
                 var partyPlayer = new PartyPlayer(player);
+
                 partyPlayer?.SetLocalPlayer(player.Id == m_LocalPlayer.Id);
+                if (partyPlayer.IsLocalPlayer)
+                    m_LocalPlayer = partyPlayer;
                 partyPlayer?.SetHost(partyPlayer.Id == hostID);
-                m_PartyListView.UpdatePlayer(partyPlayer);
+
+                partyPlayers.Add(partyPlayer);
             }
+
+            m_PartyListView.UpdatePlayers(partyPlayers, m_LocalPlayer.IsHost);
+        }
+
+        async Task SubscribeToPartyEvents(string lobbyID)
+        {
+            m_PartyEventCallbacks = new LobbyEventCallbacks();
+            m_PartyEventCallbacks.LobbyChanged += OnPartyChanged;
+            m_PartyEventCallbacks.KickedFromLobby += KickedFromParty;
+            m_PartyEventCallbacks.LobbyEventConnectionStateChanged += PartyConnectionStateChange;
+            await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyID, m_PartyEventCallbacks);
+        }
+
+        void OnPartyChanged(ILobbyChanges changes)
+        {
+            if (changes.LobbyDeleted)
+            {
+                OnLeaveParty();
+                return;
+            }
+
+            changes.ApplyToLobby(m_PartyLobby);
+            UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
+        }
+
+        void KickedFromParty()
+        {
+            Debug.Log("Removed from party!");
+            OnLeaveParty();
+        }
+
+        void OnLeaveParty()
+        {
+            m_PartyInfoView.LeftParty();
+            m_PartyListView.ClearAll();
+            m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
 
         async void OnReadyClicked()
@@ -156,6 +194,11 @@ namespace Unity.Services.Samples.Parties
             {
                 Debug.Log(e);
             }
+        }
+
+        void PartyConnectionStateChange(LobbyEventConnectionState obj)
+        {
+            Debug.Log($"Party Connection Changed:  {obj}");
         }
     }
 }
