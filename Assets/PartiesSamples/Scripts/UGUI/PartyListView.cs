@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+
 namespace Unity.Services.Samples.Parties
 {
     public class PartyListView : MonoBehaviour
@@ -9,9 +10,8 @@ namespace Unity.Services.Samples.Parties
         public event Action onReadyClicked;
         public event Action onUnReadyClicked;
 
-        [SerializeField] ScrollRect m_PlayerListScroller;
-        [SerializeField] PartyEntryView m_PlayerEntryPrefab;
-
+        [SerializeField] Transform m_ContentTransform;
+        [SerializeField] PartyEntryView m_PartyEntryPrefab;
 
         [SerializeField] Button m_ReadyButton;
         [SerializeField] Button m_UnReadyButton;
@@ -24,44 +24,35 @@ namespace Unity.Services.Samples.Parties
             m_UnReadyButton.onClick.AddListener(OnUnreadyClicked);
         }
 
+        public void Clear()
+        {
+            foreach(var entry in m_PartyEntryViews.Values)
+                entry.Clear();
+        }
+
         public void UpdatePlayer(PartyPlayer playerData)
         {
-
             if (m_PartyEntryViews.ContainsKey(playerData.Id))
             {
                 m_PartyEntryViews[playerData.Id].Refresh(playerData);
             }
             else
             {
-                var entry = Instantiate(m_PlayerEntryPrefab, m_PlayerListScroller.transform);
+                var entry = Instantiate(m_PartyEntryPrefab, m_ContentTransform.transform);
                 m_PartyEntryViews.Add(playerData.Id, entry);
             }
-
         }
-
-        public void Refresh(List<PartyPlayer> players)
-        {
-            foreach (var partyPLayer in players)
-            {
-                UpdatePlayer(partyPLayer);
-            }
-        }
-
 
         void OnReadyClicked()
         {
             onReadyClicked?.Invoke();
             m_ReadyButton.gameObject.SetActive(false);
-            m_UnReadyButton.gameObject.SetActive(true);
-
         }
 
         void OnUnreadyClicked()
         {
             onUnReadyClicked?.Invoke();
             m_ReadyButton.gameObject.SetActive(true);
-            m_UnReadyButton.gameObject.SetActive(false);
-
         }
     }
 }

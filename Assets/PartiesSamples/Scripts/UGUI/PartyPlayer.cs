@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+
 namespace Unity.Services.Samples.Parties
 {
     /// <summary>
@@ -11,9 +12,17 @@ namespace Unity.Services.Samples.Parties
     {
         public string Name => Data[nameof(Name)].Value;
         public bool IsReady => bool.Parse(Data[nameof(IsReady)].Value);
+        [field: SerializeField] public bool IsHost { get; private set; }
         [field: SerializeField] public bool IsLocalPlayer { get; private set; }
 
-        public PartyPlayer(string playerID, string name, bool isLocalPlayer = false):base(playerID)
+        public PartyPlayer(Player player)
+            : base(player.Id)
+        {
+            Data = player.Data;
+        }
+
+        public PartyPlayer(string playerID, string name, bool isLocalPlayer)
+            : base(playerID)
         {
             Data = new Dictionary<string, PlayerDataObject>
             {
@@ -25,8 +34,12 @@ namespace Unity.Services.Samples.Parties
                 }
             };
 
-
             IsLocalPlayer = isLocalPlayer;
+        }
+
+        public void SetHost(bool isHost)
+        {
+            IsHost = isHost;
         }
 
         public void SetName(string name)
@@ -38,9 +51,10 @@ namespace Unity.Services.Samples.Parties
         {
             Data[nameof(IsReady)].Value = $"{ready}";
         }
-        public void SetLocalPlayer()
+
+        public void SetLocalPlayer(bool isLocalPlayer)
         {
-            IsLocalPlayer = true;
+            IsLocalPlayer = isLocalPlayer;
         }
     }
 }

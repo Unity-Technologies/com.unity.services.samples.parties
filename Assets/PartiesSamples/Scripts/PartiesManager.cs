@@ -21,6 +21,7 @@ namespace Unity.Services.Samples.Parties
 
         Lobby m_PartyLobby;
         PartyPlayer m_LocalPlayer;
+
         async void Start()
         {
             await Authenticate();
@@ -32,35 +33,31 @@ namespace Unity.Services.Samples.Parties
             await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             CreateLocalPlayer();
-
         }
-
 
         void CreateLocalPlayer()
         {
             var id = AuthenticationService.Instance.PlayerId;
             var localPlayerName = $"{k_LocalPlayerNamePrefix}_{id}";
 
-            m_LocalPlayer = new PartyPlayer(id, localPlayerName);
+            m_LocalPlayer = new PartyPlayer(id, localPlayerName, true);
         }
 
         void UIInit()
         {
-
             m_PartiesViewUGUI.Init();
+
             //Party Info
-            m_PartyInfoView = m_PartiesViewUGUI.partyInfoView;
+            m_PartyInfoView = m_PartiesViewUGUI.PartyInfoView;
             m_PartyInfoView.onJoinPartyPressed += TryJoinLobby;
             m_PartyInfoView.onCreatePressed += CreateLobby;
             m_PartyInfoView.onLeavePressed += LeaveLobby;
 
             //Party List
-            m_PartyListView = m_PartiesViewUGUI.partyListView;
+            m_PartyListView = m_PartiesViewUGUI.PartyListView;
             m_PartyListView.onReadyClicked += OnReadyClicked;
             m_PartyListView.onUnReadyClicked += OnUnreadyClicked;
-
         }
-
 
         async void CreateLobby()
         {
@@ -70,10 +67,10 @@ namespace Unity.Services.Samples.Parties
                 {
                     IsPrivate = true,
                     Player = m_LocalPlayer
-
                 };
                 var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
-                m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName, k_MaxPartyMembers, partyLobbyOptions);
+                m_PartyLobby =
+                    await LobbyService.Instance.CreateLobbyAsync(partyLobbyName, k_MaxPartyMembers, partyLobbyOptions);
                 OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
@@ -105,17 +102,33 @@ namespace Unity.Services.Samples.Parties
             {
                 Debug.Log(e);
             }
+            //Leave Lobby Regardless of call
+            OnLeftLobby();
         }
 
         void OnJoinedLobby(Lobby lobby)
         {
             m_PartyInfoView.JoinParty(lobby.LobbyCode);
-            foreach (var player in lobby.Players)
+
+            UpdatePlayers(lobby.Players, lobby.HostId);
+
+            //Subscribe to lobby updates
+        }
+
+        void OnLeftLobby()
+        {
+            m_PartyInfoView.LeftParty();
+            m_PartyListView.Clear();
+        }
+
+        void UpdatePlayers(List<Player> players, string hostID)
+        {
+            foreach (var player in players)
             {
-                var partyPlayer = player as PartyPlayer;
-                if (player.Id == m_LocalPlayer.Id)
-                    partyPlayer.SetLocalPlayer();
-                m_PartyListView.UpdatePlayer((PartyPlayer)player);
+                var partyPlayer = new PartyPlayer(player);
+                partyPlayer?.SetLocalPlayer(player.Id == m_LocalPlayer.Id);
+                partyPlayer?.SetHost(partyPlayer.Id == hostID);
+                m_PartyListView.UpdatePlayer(partyPlayer);
             }
         }
 
@@ -129,7 +142,6 @@ namespace Unity.Services.Samples.Parties
         {
             m_LocalPlayer.SetReady(false);
             await UpdateLocalPlayer();
-
         }
 
         async Task UpdateLocalPlayer()
@@ -137,7 +149,8 @@ namespace Unity.Services.Samples.Parties
             try
             {
                 var localUpdatedPlayerData = new UpdatePlayerOptions() { Data = m_LocalPlayer.Data };
-                await LobbyService.Instance.UpdatePlayerAsync(m_PartyLobby.Id, m_LocalPlayer.Id, localUpdatedPlayerData);
+                await LobbyService.Instance.UpdatePlayerAsync(m_PartyLobby.Id, m_LocalPlayer.Id,
+                    localUpdatedPlayerData);
             }
             catch (LobbyServiceException e)
             {

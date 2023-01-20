@@ -5,13 +5,13 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartiesViewUGUI : MonoBehaviour
     {
-        [field: SerializeField] public PartyInfoView partyInfoView { get; private set; }
-        [field: SerializeField] public PartyListView partyListView { get; private set; }
+        [field: SerializeField] public PartyInfoView PartyInfoView { get; private set; }
+        [field: SerializeField] public PartyListView PartyListView { get; private set; }
 
         public void Init()
         {
-            partyInfoView.Init();
-            partyListView.Init();
+            PartyInfoView.Init();
+            PartyListView.Init();
         }
     }
 }
