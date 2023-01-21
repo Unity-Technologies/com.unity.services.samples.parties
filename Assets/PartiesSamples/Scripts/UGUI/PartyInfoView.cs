@@ -30,16 +30,18 @@ namespace Unity.Services.Samples.Parties
 
         public void JoinParty(string partyCode)
         {
-            SetInPartyView();
+            SetInParty();
             m_InGameJoinCode.text = partyCode;
         }
 
         public void LeftParty()
         {
-            SetOutsidePartyView();
+            m_InGameJoinCode.text = null;
+
+            SetOutOfParty();
         }
 
-        void SetInPartyView()
+        void SetInParty()
         {
             m_JoinCreateView.alpha = 0;
             m_JoinCreateView.interactable = false;
@@ -49,7 +51,7 @@ namespace Unity.Services.Samples.Parties
             m_InPartyView.blocksRaycasts = true;
         }
 
-        void SetOutsidePartyView()
+         void SetOutOfParty()
         {
             m_JoinCreateView.alpha = 1;
             m_JoinCreateView.interactable = true;

@@ -7,12 +7,14 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Samples.Utilities;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Unity.Services.Samples.Parties
 {
     public class PartiesManager : MonoBehaviour
     {
-        public event Action onAllPartyMembersReady;
+        //Up for debate: Exposing UnitActions for party callbacks? Does this make it easier for people to extend?
+        public UnityEvent onAllPartyMembersReady;
         [SerializeField] PartiesViewUGUI m_PartiesViewUGUI;
         const int k_MaxPartyMembers = 4;
         const string k_PartyNamePrefix = "Party";
@@ -42,6 +44,7 @@ namespace Unity.Services.Samples.Parties
         void CreateLocalPlayer()
         {
             var id = AuthenticationService.Instance.PlayerId;
+            //TODO Name Input Field or random names
             var localPlayerName = $"{k_LocalPlayerNamePrefix}_{id}";
 
             m_LocalPlayer = new PartyPlayer(id, localPlayerName, true);
@@ -73,6 +76,7 @@ namespace Unity.Services.Samples.Parties
                     IsPrivate = true,
                     Player = m_LocalPlayer
                 };
+                //TODO a Label for the party name eg. "Jacobs' Party"
                 var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
                 m_PartyLobby =
                     await LobbyService.Instance.CreateLobbyAsync(partyLobbyName, k_MaxPartyMembers, partyLobbyOptions);
@@ -157,6 +161,7 @@ namespace Unity.Services.Samples.Parties
 
         void AllMembersReady()
         {
+            //This is where users would hook in their own game responses?
             onAllPartyMembersReady?.Invoke();
             Debug.Log("All party Members Ready!");
         }

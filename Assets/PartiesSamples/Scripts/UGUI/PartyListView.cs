@@ -47,6 +47,8 @@ namespace Unity.Services.Samples.Parties
 
             GrowPanelToEntryList();
 
+            //I couldnt create am expandable List view with a scroller using only Canvas behaviours.
+            //So we set the size of the Party window and list view manually.
             void GrowPanelToEntryList()
             {
                 var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
