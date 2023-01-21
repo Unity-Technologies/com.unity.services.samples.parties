@@ -197,7 +197,7 @@ MonoBehaviour:
   m_PartyContentPanel: {fileID: 5258786834238762939}
   m_NameText: {fileID: 4592464931323978452}
   m_ReadyPanel: {fileID: 7753822394978683119}
-  m_PlayerPanel: {fileID: 8890703986019367857}
+  m_PlayerPanel: {fileID: 8760691553439164237}
   m_PartyLeaderText: {fileID: 5231507867019049751}
   m_KickButton: {fileID: 7704542319090853011}
 --- !u!114 &4654349587653500037

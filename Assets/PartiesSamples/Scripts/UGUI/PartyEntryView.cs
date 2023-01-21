@@ -7,7 +7,7 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyEntryView : MonoBehaviour
     {
-        public event Action onKick;
+        public Action onKick;
         [SerializeField] GameObject m_PartyContentPanel;
         [SerializeField] TMP_Text m_NameText;
         [SerializeField] GameObject m_ReadyPanel;
@@ -15,21 +15,20 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] TMP_Text m_PartyLeaderText;
         [SerializeField] Button m_KickButton;
 
-        Color m_PlayerColor = new Color(0.3f, 0.6f, 0.7f);
-        Color m_DefaultColor = new Color(0.3f, 0.6f, 0.7f);
+        Color m_PlayerColor = new Color(0.3f, 0.5f, 0.3f);
+        Color m_DefaultColor = new Color(0.5f, 0.5f, 0.5f);
 
         public void Init()
         {
             m_KickButton.onClick.AddListener(() => onKick?.Invoke());
             m_KickButton.gameObject.SetActive(false);
-            Clear();
+            SetEmpty();
         }
 
         public void Refresh(PartyPlayer playerData, bool imHost)
         {
             if (imHost && !playerData.IsLocalPlayer)
                 m_KickButton.gameObject.SetActive(true);
-
             m_PartyContentPanel.SetActive(true);
             m_NameText.text = playerData.Name;
             m_ReadyPanel.gameObject.SetActive(playerData.IsReady);
@@ -37,7 +36,7 @@ namespace Unity.Services.Samples.Parties
             m_PartyLeaderText.alpha = playerData.IsHost ? 1 : 0;
         }
 
-        public void Clear()
+        public void SetEmpty()
         {
             m_KickButton.gameObject.SetActive(false);
             m_NameText.text = "Empty";

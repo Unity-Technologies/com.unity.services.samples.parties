@@ -10,6 +10,7 @@ namespace Unity.Services.Samples.Parties
     {
         public event Action onReadyClicked;
         public event Action onUnReadyClicked;
+        public event Action<string> onKickClicked;
 
         [SerializeField] PartyEntryView m_PartyEntryPrefab;
         [SerializeField] LayoutElement m_ScrollElement;
@@ -21,6 +22,7 @@ namespace Unity.Services.Samples.Parties
 
         List<PartyEntryView> m_PartyEntryViews = new List<PartyEntryView>();
         Dictionary<int, PartyEntryView> m_PartyPlayerIndexMap = new Dictionary<int, PartyEntryView>();
+        int m_MaxPartySize;
 
         public void Init(int maxPartySize)
         {
@@ -33,30 +35,47 @@ namespace Unity.Services.Samples.Parties
 
             m_ReadyButton.onClick.AddListener(OnReadyClicked);
             m_UnReadyButton.onClick.AddListener(OnUnreadyClicked);
-
-            ResizeListView(maxPartySize);
+            m_MaxPartySize = maxPartySize;
+            HideParty();
         }
 
-        void ResizeListView(int maxPartySize)
-        {
-            var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
-                m_EntryLayoutGroup.spacing;
-
-            m_ScrollElement.minHeight = maxPartySize * entryHeight;
-
-            var panelSpacing = m_PartyLayoutGroup.spacing;
-            var panelPadding = m_PartyLayoutGroup.padding.top + m_PartyLayoutGroup.padding.bottom;
-            var scrollSize = maxPartySize * entryHeight + panelSpacing;
-            var buttonHeight = m_ButtonPanel.minHeight + panelSpacing;
-            var panelSize = scrollSize + buttonHeight + panelPadding;
-
-            gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, panelSize);
-        }
-
-        public void ClearAll()
+        public void ShowParty()
         {
             foreach (var entry in m_PartyEntryViews)
-                entry.Clear();
+                entry.gameObject.SetActive(true);
+            m_ButtonPanel.gameObject.SetActive(true);
+
+            GrowPanelToEntryList();
+
+            void GrowPanelToEntryList()
+            {
+                var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
+                    m_EntryLayoutGroup.spacing;
+                m_ScrollElement.minHeight = m_MaxPartySize * entryHeight;
+
+                var panelSpacing = m_PartyLayoutGroup.spacing;
+                var panelPadding = m_PartyLayoutGroup.padding.top + m_PartyLayoutGroup.padding.bottom;
+                var scrollSize = m_MaxPartySize * entryHeight + panelSpacing;
+                var buttonHeight = m_ButtonPanel.minHeight + panelSpacing;
+                var panelSize = scrollSize + buttonHeight + panelPadding;
+
+                gameObject.GetComponent<RectTransform>()
+                    .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, panelSize);
+            }
+        }
+
+        public void HideParty()
+        {
+            foreach (var entry in m_PartyEntryViews)
+                entry.gameObject.SetActive(false);
+            m_ButtonPanel.gameObject.SetActive(false);
+            gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+        }
+
+        void SetAllEmpty()
+        {
+            foreach (var entry in m_PartyEntryViews)
+                entry.SetEmpty();
         }
 
         /// <summary>
@@ -64,9 +83,9 @@ namespace Unity.Services.Samples.Parties
         /// to keep the lobby index for removal purposes later.
         /// If you are the host, you get special actions visible to you.
         /// </summary>
-        public void UpdatePlayers(List<PartyPlayer> players, bool imHost)
+        public void Refresh(List<PartyPlayer> players, bool imHost)
         {
-            ClearAll();
+            SetAllEmpty();
             m_PartyPlayerIndexMap = new Dictionary<int, PartyEntryView>();
             var localPlayerEntry = m_PartyEntryViews.First();
 
@@ -86,17 +105,13 @@ namespace Unity.Services.Samples.Parties
                     nonLocalPlayerViews.RemoveAt(0);
                 }
 
+                if (imHost)
+                    finalEntryView.onKick = () => onKickClicked?.Invoke(player.Id);
+
                 finalEntryView.Refresh(player, imHost);
+
                 m_PartyPlayerIndexMap.Add(playerIndex, finalEntryView);
             }
-        }
-
-        //TODO YAGNI
-        public void RemovePlayer(int partySlot)
-        {
-            var playerView = m_PartyPlayerIndexMap[partySlot];
-            m_PartyPlayerIndexMap.Remove(partySlot);
-            playerView.Clear();
         }
 
         void OnReadyClicked()
