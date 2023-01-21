@@ -5,12 +5,14 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
+using Unity.Services.Samples.Utilities;
 using UnityEngine;
 
 namespace Unity.Services.Samples.Parties
 {
     public class PartiesManager : MonoBehaviour
     {
+        public event Action onAllPartyMembersReady;
         [SerializeField] PartiesViewUGUI m_PartiesViewUGUI;
         const int k_MaxPartyMembers = 4;
         const string k_PartyNamePrefix = "Party";
@@ -31,7 +33,8 @@ namespace Unity.Services.Samples.Parties
 
         async Task Authenticate()
         {
-            await UnityServices.InitializeAsync();
+            var authOptions = AuthUtility.TryCreateEditorTestingProfile();
+            await UnityServices.InitializeAsync(authOptions);
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
             CreateLocalPlayer();
         }
@@ -58,6 +61,7 @@ namespace Unity.Services.Samples.Parties
             m_PartyListView = m_PartiesViewUGUI.PartyListView;
             m_PartyListView.onReadyClicked += OnReadyClicked;
             m_PartyListView.onUnReadyClicked += OnUnreadyClicked;
+            m_PartyListView.onKickClicked += KickFromParty;
         }
 
         async void CreateLobby()
@@ -84,7 +88,11 @@ namespace Unity.Services.Samples.Parties
         {
             try
             {
-                m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode);
+                var joinOptions = new JoinLobbyByCodeOptions()
+                {
+                    Player = m_LocalPlayer
+                };
+                m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, joinOptions);
                 await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
@@ -105,22 +113,29 @@ namespace Unity.Services.Samples.Parties
             }
 
             //Leave Lobby Regardless of call
-            OnLeaveParty();
+            OnLeftLobby();
         }
 
         async Task OnJoinedLobby(Lobby lobby)
         {
             m_PartyInfoView.JoinParty(lobby.LobbyCode);
 
+            m_PartyListView.ShowParty();
             UpdatePlayers(lobby.Players, lobby.HostId);
 
             //Subscribe to lobby updates
             await SubscribeToPartyEvents(lobby.Id);
         }
 
+        async void KickFromParty(string playerID)
+        {
+            await LobbyService.Instance.RemovePlayerAsync(m_PartyLobby.Id, playerID);
+        }
+
         void UpdatePlayers(List<Player> players, string hostID)
         {
             var partyPlayers = new List<PartyPlayer>();
+            int readyCount = 0;
             foreach (var player in players)
             {
                 var partyPlayer = new PartyPlayer(player);
@@ -129,11 +144,21 @@ namespace Unity.Services.Samples.Parties
                 if (partyPlayer.IsLocalPlayer)
                     m_LocalPlayer = partyPlayer;
                 partyPlayer?.SetHost(partyPlayer.Id == hostID);
-
+                if (partyPlayer.IsReady)
+                    readyCount++;
                 partyPlayers.Add(partyPlayer);
             }
 
-            m_PartyListView.UpdatePlayers(partyPlayers, m_LocalPlayer.IsHost);
+            if (readyCount >= partyPlayers.Count)
+                AllMembersReady();
+
+            m_PartyListView.Refresh(partyPlayers, m_LocalPlayer.IsHost);
+        }
+
+        void AllMembersReady()
+        {
+            onAllPartyMembersReady?.Invoke();
+            Debug.Log("All party Members Ready!");
         }
 
         async Task SubscribeToPartyEvents(string lobbyID)
@@ -149,7 +174,7 @@ namespace Unity.Services.Samples.Parties
         {
             if (changes.LobbyDeleted)
             {
-                OnLeaveParty();
+                OnLeftLobby();
                 return;
             }
 
@@ -160,13 +185,13 @@ namespace Unity.Services.Samples.Parties
         void KickedFromParty()
         {
             Debug.Log("Removed from party!");
-            OnLeaveParty();
+            OnLeftLobby();
         }
 
-        void OnLeaveParty()
+        void OnLeftLobby()
         {
             m_PartyInfoView.LeftParty();
-            m_PartyListView.ClearAll();
+            m_PartyListView.HideParty();
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
 
