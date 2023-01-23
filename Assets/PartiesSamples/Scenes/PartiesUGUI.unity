@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.18028378, g: 0.22571412, b: 0.30692285, a: 1}
+  m_IndirectSpecularColor: {r: 0.18028352, g: 0.22571376, b: 0.30692244, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -389,10 +389,6 @@ PrefabInstance:
       propertyPath: m_SizeDelta.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1152159370667842789, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1691068020107100638, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
       propertyPath: m_Color.a
       value: 0.6431373
@@ -532,30 +528,6 @@ PrefabInstance:
     - target: {fileID: 6530099141363559186, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0.000030517578
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_Pivot.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_Pivot.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: 120
-      objectReference: {fileID: 0}
-    - target: {fileID: 7041240469751205622, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7416254541389400273, guid: 66901b90b9bd9604ab2324a0df54748e, type: 3}
       propertyPath: m_IsActive

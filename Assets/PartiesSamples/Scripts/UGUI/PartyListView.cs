@@ -8,9 +8,9 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyListView : MonoBehaviour
     {
-        public event Action onReadyClicked;
-        public event Action onUnReadyClicked;
-        public event Action<string> onKickClicked;
+        public event Action OnReadyClicked;
+        public event Action OnUnReadyClicked;
+        public event Action<string> OnKickClicked;
 
         [SerializeField] PartyEntryView m_PartyEntryPrefab;
         [SerializeField] LayoutElement m_ScrollElement;
@@ -21,7 +21,6 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] VerticalLayoutGroup m_EntryLayoutGroup;
 
         List<PartyEntryView> m_PartyEntryViews = new List<PartyEntryView>();
-        Dictionary<int, PartyEntryView> m_PartyPlayerIndexMap = new Dictionary<int, PartyEntryView>();
         int m_MaxPartySize;
 
         public void Init(int maxPartySize)
@@ -33,8 +32,8 @@ namespace Unity.Services.Samples.Parties
                 entry.Init();
             }
 
-            m_ReadyButton.onClick.AddListener(OnReadyClicked);
-            m_UnReadyButton.onClick.AddListener(OnUnreadyClicked);
+            m_ReadyButton.onClick.AddListener(OnReady);
+            m_UnReadyButton.onClick.AddListener(OnUnready);
             m_MaxPartySize = maxPartySize;
             HideParty();
         }
@@ -46,22 +45,6 @@ namespace Unity.Services.Samples.Parties
             m_ButtonPanel.gameObject.SetActive(true);
 
             GrowPanelToEntryList();
-
-            void GrowPanelToEntryList()
-            {
-                var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
-                    m_EntryLayoutGroup.spacing;
-                m_ScrollElement.minHeight = m_MaxPartySize * entryHeight;
-
-                var panelSpacing = m_PartyLayoutGroup.spacing;
-                var panelPadding = m_PartyLayoutGroup.padding.top + m_PartyLayoutGroup.padding.bottom;
-                var scrollSize = m_MaxPartySize * entryHeight + panelSpacing;
-                var buttonHeight = m_ButtonPanel.minHeight + panelSpacing;
-                var panelSize = scrollSize + buttonHeight + panelPadding;
-
-                gameObject.GetComponent<RectTransform>()
-                    .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, panelSize);
-            }
         }
 
         public void HideParty()
@@ -72,6 +55,21 @@ namespace Unity.Services.Samples.Parties
             gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
         }
 
+        void GrowPanelToEntryList()
+        {
+            var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
+                              m_EntryLayoutGroup.spacing;
+            m_ScrollElement.minHeight = m_MaxPartySize * entryHeight;
+
+            var panelSpacing = m_PartyLayoutGroup.spacing;
+            var panelPadding = m_PartyLayoutGroup.padding.top + m_PartyLayoutGroup.padding.bottom;
+            var scrollSize = m_MaxPartySize * entryHeight + panelSpacing;
+            var buttonHeight = m_ButtonPanel.minHeight + panelSpacing;
+            var panelSize = scrollSize + buttonHeight + panelPadding;
+
+            gameObject.GetComponent<RectTransform>()
+                      .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, panelSize);
+        }
         void SetAllEmpty()
         {
             foreach (var entry in m_PartyEntryViews)
@@ -79,50 +77,47 @@ namespace Unity.Services.Samples.Parties
         }
 
         /// <summary>
-        /// Assumes an ordered player list from the lobby. We always want to show the player in EntryView 0, but need
-        /// to keep the lobby index for removal purposes later.
+        /// Assumes an ordered player list from the lobby. We always want to show the player in EntryView 0,
         /// If you are the host, you get special actions visible to you.
         /// </summary>
         public void Refresh(List<PartyPlayer> players, bool imHost)
         {
             SetAllEmpty();
-            m_PartyPlayerIndexMap = new Dictionary<int, PartyEntryView>();
             var localPlayerEntry = m_PartyEntryViews.First();
 
-            //Isolate non-local players
+            //Copy the view list without the player
             var nonLocalPlayerViews = new List<PartyEntryView>(m_PartyEntryViews);
             nonLocalPlayerViews.Remove(localPlayerEntry);
 
+            //Players are ordered by the Lobby SDK
             foreach (var player in players)
             {
-                var playerIndex = players.IndexOf(player);
-                PartyEntryView finalEntryView = null;
+                PartyEntryView remotePlayerView = null;
                 if (player.IsLocalPlayer)
-                    finalEntryView = localPlayerEntry;
+                    remotePlayerView = localPlayerEntry;
                 else
                 {
-                    finalEntryView = nonLocalPlayerViews.First();
+                    remotePlayerView = nonLocalPlayerViews.First();
                     nonLocalPlayerViews.RemoveAt(0);
                 }
-
+                //Overwrite the Kick action, since the players could shuffle around, we want to make sure the button kicks the current player.
                 if (imHost)
-                    finalEntryView.onKick = () => onKickClicked?.Invoke(player.Id);
+                    remotePlayerView.OnKickClicked = () => OnKickClicked?.Invoke(player.Id);
 
-                finalEntryView.Refresh(player, imHost);
+                remotePlayerView.Refresh(player, imHost);
 
-                m_PartyPlayerIndexMap.Add(playerIndex, finalEntryView);
             }
         }
 
-        void OnReadyClicked()
+        void OnReady()
         {
-            onReadyClicked?.Invoke();
+            OnReadyClicked?.Invoke();
             m_ReadyButton.gameObject.SetActive(false);
         }
 
-        void OnUnreadyClicked()
+        void OnUnready()
         {
-            onUnReadyClicked?.Invoke();
+            OnUnReadyClicked?.Invoke();
             m_ReadyButton.gameObject.SetActive(true);
         }
     }

@@ -1,10 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using ParrelSync;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using UnityEngine;
 
 namespace Unity.Services.Samples.Utilities
 {
