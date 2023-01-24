@@ -7,11 +7,11 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyEntryView : MonoBehaviour
     {
-        public Action onKick;
+        public Action OnKickClicked;
         [SerializeField] GameObject m_PartyContentPanel;
-        [SerializeField] TMP_Text m_NameText;
         [SerializeField] GameObject m_ReadyPanel;
         [SerializeField] Image m_PlayerPanel;
+        [SerializeField] TMP_Text m_NameText;
         [SerializeField] TMP_Text m_PartyLeaderText;
         [SerializeField] Button m_KickButton;
 
@@ -20,7 +20,7 @@ namespace Unity.Services.Samples.Parties
 
         public void Init()
         {
-            m_KickButton.onClick.AddListener(() => onKick?.Invoke());
+            m_KickButton.onClick.AddListener(() => OnKickClicked?.Invoke());
             m_KickButton.gameObject.SetActive(false);
             SetEmpty();
         }
@@ -29,6 +29,7 @@ namespace Unity.Services.Samples.Parties
         {
             if (imHost && !playerData.IsLocalPlayer)
                 m_KickButton.gameObject.SetActive(true);
+
             m_PartyContentPanel.SetActive(true);
             m_NameText.text = playerData.Name;
             m_ReadyPanel.gameObject.SetActive(playerData.IsReady);

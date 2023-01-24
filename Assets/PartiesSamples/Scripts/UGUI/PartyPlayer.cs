@@ -41,11 +41,6 @@ namespace Unity.Services.Samples.Parties
             IsHost = isHost;
         }
 
-        public void SetName(string name)
-        {
-            Data[nameof(Name)].Value = name;
-        }
-
         public void SetReady(bool ready)
         {
             Data[nameof(IsReady)].Value = $"{ready}";

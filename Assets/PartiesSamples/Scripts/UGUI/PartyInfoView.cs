@@ -7,9 +7,9 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyInfoView : MonoBehaviour
     {
-        public event Action<string> onJoinPartyPressed;
-        public event Action onCreatePressed;
-        public event Action onLeavePressed;
+        public event Action<string> OnJoinPartyClicked;
+        public event Action OnCreateClicked;
+        public event Action OnLeaveClicked;
 
         [SerializeField] CanvasGroup m_JoinCreateView;
         [SerializeField] CanvasGroup m_InPartyView;
@@ -23,47 +23,43 @@ namespace Unity.Services.Samples.Parties
 
         public void Init()
         {
-            m_JoinButton.onClick.AddListener(OnJoinPartyPressed);
-            m_CreateButton.onClick.AddListener(() => onCreatePressed?.Invoke());
-            m_LeaveButton.onClick.AddListener(() => onLeavePressed?.Invoke());
+            m_JoinButton.onClick.AddListener(() => OnJoinPartyClicked?.Invoke(m_JoinPartyInput.text));
+            m_CreateButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
+            m_LeaveButton.onClick.AddListener(() => OnLeaveClicked?.Invoke());
         }
 
         public void JoinParty(string partyCode)
         {
-            SetInParty();
+            ShowPartyInfo();
             m_InGameJoinCode.text = partyCode;
+
+            void ShowPartyInfo()
+            {
+                m_JoinCreateView.alpha = 0;
+                m_JoinCreateView.interactable = false;
+                m_JoinCreateView.blocksRaycasts = false;
+                m_InPartyView.alpha = 1;
+                m_InPartyView.interactable = true;
+                m_InPartyView.blocksRaycasts = true;
+            }
         }
 
         public void LeftParty()
         {
-            m_InGameJoinCode.text = null;
-
-            SetOutOfParty();
+            HidePartyInfo();
+            void HidePartyInfo()
+            {
+                m_JoinCreateView.alpha = 1;
+                m_JoinCreateView.interactable = true;
+                m_JoinCreateView.blocksRaycasts = true;
+                m_InPartyView.alpha = 0;
+                m_InPartyView.interactable = false;
+                m_InPartyView.blocksRaycasts = false;
+            }
         }
 
-        void SetInParty()
-        {
-            m_JoinCreateView.alpha = 0;
-            m_JoinCreateView.interactable = false;
-            m_JoinCreateView.blocksRaycasts = false;
-            m_InPartyView.alpha = 1;
-            m_InPartyView.interactable = true;
-            m_InPartyView.blocksRaycasts = true;
-        }
 
-         void SetOutOfParty()
-        {
-            m_JoinCreateView.alpha = 1;
-            m_JoinCreateView.interactable = true;
-            m_JoinCreateView.blocksRaycasts = true;
-            m_InPartyView.alpha = 0;
-            m_InPartyView.interactable = false;
-            m_InPartyView.blocksRaycasts = false;
-        }
 
-        void OnJoinPartyPressed()
-        {
-            onJoinPartyPressed?.Invoke(m_JoinPartyInput.text);
-        }
+
     }
 }
