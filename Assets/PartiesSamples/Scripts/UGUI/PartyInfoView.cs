@@ -7,23 +7,24 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyInfoView : MonoBehaviour
     {
-        public event Action<string> OnJoinPartyClicked;
+        public event Action OnJoinPartyClicked;
         public event Action OnCreateClicked;
         public event Action OnLeaveClicked;
 
         [SerializeField] CanvasGroup m_JoinCreateView;
         [SerializeField] CanvasGroup m_InPartyView;
 
-        [SerializeField] TMP_InputField m_JoinPartyInput;
         [SerializeField] TMP_InputField m_InGameJoinCode;
 
+        [SerializeField] Button m_CopyButton;
         [SerializeField] Button m_JoinButton;
         [SerializeField] Button m_CreateButton;
         [SerializeField] Button m_LeaveButton;
 
         public void Init()
         {
-            m_JoinButton.onClick.AddListener(() => OnJoinPartyClicked?.Invoke(m_JoinPartyInput.text));
+            m_CopyButton.onClick.AddListener(() => GUIUtility.systemCopyBuffer = m_InGameJoinCode.text);
+            m_JoinButton.onClick.AddListener(() => OnJoinPartyClicked?.Invoke());
             m_CreateButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
             m_LeaveButton.onClick.AddListener(() => OnLeaveClicked?.Invoke());
         }
@@ -47,6 +48,7 @@ namespace Unity.Services.Samples.Parties
         public void LeftParty()
         {
             HidePartyInfo();
+
             void HidePartyInfo()
             {
                 m_JoinCreateView.alpha = 1;
@@ -57,9 +59,5 @@ namespace Unity.Services.Samples.Parties
                 m_InPartyView.blocksRaycasts = false;
             }
         }
-
-
-
-
     }
 }

@@ -35,10 +35,10 @@ namespace Unity.Services.Samples.Parties
             m_ReadyButton.onClick.AddListener(OnReady);
             m_UnReadyButton.onClick.AddListener(OnUnready);
             m_MaxPartySize = maxPartySize;
-            HideParty();
+            Hide();
         }
 
-        public void ShowParty()
+        public void Show()
         {
             foreach (var entry in m_PartyEntryViews)
                 entry.gameObject.SetActive(true);
@@ -47,7 +47,7 @@ namespace Unity.Services.Samples.Parties
             GrowPanelToEntryList();
         }
 
-        public void HideParty()
+        public void Hide()
         {
             foreach (var entry in m_PartyEntryViews)
                 entry.gameObject.SetActive(false);
