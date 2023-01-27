@@ -7,14 +7,20 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyInfoView : MonoBehaviour
     {
+        public event Action OnReadyClicked;
+        public event Action OnUnReadyClicked;
         public event Action OnJoinPartyClicked;
         public event Action OnCreateClicked;
         public event Action OnLeaveClicked;
 
-        [SerializeField] CanvasGroup m_JoinCreateView;
-        [SerializeField] CanvasGroup m_InPartyView;
+        [SerializeField] GameObject m_JoinCreateView;
+        [SerializeField] GameObject m_InPartyView;
+        [SerializeField] LayoutElement m_ButtonPanel;
 
         [SerializeField] TMP_InputField m_InGameJoinCode;
+
+        [SerializeField] Button m_ReadyButton;
+        [SerializeField] Button m_UnReadyButton;
 
         [SerializeField] Button m_CopyButton;
         [SerializeField] Button m_JoinButton;
@@ -27,37 +33,35 @@ namespace Unity.Services.Samples.Parties
             m_JoinButton.onClick.AddListener(() => OnJoinPartyClicked?.Invoke());
             m_CreateButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
             m_LeaveButton.onClick.AddListener(() => OnLeaveClicked?.Invoke());
+            m_ReadyButton.onClick.AddListener(OnReady);
+            m_UnReadyButton.onClick.AddListener(OnUnready);
         }
 
         public void JoinParty(string partyCode)
         {
-            ShowPartyInfo();
             m_InGameJoinCode.text = partyCode;
-
-            void ShowPartyInfo()
-            {
-                m_JoinCreateView.alpha = 0;
-                m_JoinCreateView.interactable = false;
-                m_JoinCreateView.blocksRaycasts = false;
-                m_InPartyView.alpha = 1;
-                m_InPartyView.interactable = true;
-                m_InPartyView.blocksRaycasts = true;
-            }
+            m_JoinCreateView.SetActive(false);
+            m_InPartyView.SetActive(true);
+            m_ButtonPanel.gameObject.SetActive(true);
         }
 
         public void LeftParty()
         {
-            HidePartyInfo();
+            m_JoinCreateView.SetActive(true);
+            m_InPartyView.SetActive(false);
+            m_ButtonPanel.gameObject.SetActive(false);
+        }
 
-            void HidePartyInfo()
-            {
-                m_JoinCreateView.alpha = 1;
-                m_JoinCreateView.interactable = true;
-                m_JoinCreateView.blocksRaycasts = true;
-                m_InPartyView.alpha = 0;
-                m_InPartyView.interactable = false;
-                m_InPartyView.blocksRaycasts = false;
-            }
+        void OnReady()
+        {
+            OnReadyClicked?.Invoke();
+            m_ReadyButton.gameObject.SetActive(false);
+        }
+
+        void OnUnready()
+        {
+            OnUnReadyClicked?.Invoke();
+            m_ReadyButton.gameObject.SetActive(true);
         }
     }
 }

@@ -8,21 +8,14 @@ namespace Unity.Services.Samples.Parties
 {
     public class PartyListView : MonoBehaviour
     {
-        public event Action OnReadyClicked;
-        public event Action OnUnReadyClicked;
         public event Action<string> OnKickClicked;
 
-        [SerializeField] PartyEntryView m_PartyEntryPrefab;
-        [SerializeField] LayoutElement m_ScrollElement;
-        [SerializeField] LayoutElement m_ButtonPanel;
-        [SerializeField] Button m_ReadyButton;
-        [SerializeField] Button m_UnReadyButton;
-        [SerializeField] VerticalLayoutGroup m_PartyLayoutGroup;
         [SerializeField] VerticalLayoutGroup m_EntryLayoutGroup;
+        [SerializeField] PartyEntryView m_PartyEntryPrefab;
+        [SerializeField] LayoutElement m_ScrollLayout;
 
         List<PartyEntryView> m_PartyEntryViews = new List<PartyEntryView>();
-        int m_MaxPartySize;
-
+        int m_Partysize = 1;
         public void Init(int maxPartySize)
         {
             for (int i = 0; i < maxPartySize; i++)
@@ -32,44 +25,33 @@ namespace Unity.Services.Samples.Parties
                 entry.Init();
             }
 
-            m_ReadyButton.onClick.AddListener(OnReady);
-            m_UnReadyButton.onClick.AddListener(OnUnready);
-            m_MaxPartySize = maxPartySize;
+            m_Partysize = maxPartySize;
             Hide();
         }
 
         public void Show()
         {
-            foreach (var entry in m_PartyEntryViews)
-                entry.gameObject.SetActive(true);
-            m_ButtonPanel.gameObject.SetActive(true);
-
-            GrowPanelToEntryList();
+            m_ScrollLayout.gameObject.SetActive(true);
+            GrowScrollListToContent();
         }
 
         public void Hide()
         {
-            foreach (var entry in m_PartyEntryViews)
-                entry.gameObject.SetActive(false);
-            m_ButtonPanel.gameObject.SetActive(false);
-            gameObject.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+            m_ScrollLayout.gameObject.SetActive(false);
+            m_ScrollLayout.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
         }
 
-        void GrowPanelToEntryList()
+        //Combine the heights of the elements to create the right size of the party
+        void GrowScrollListToContent()
         {
-            var entryHeight = m_PartyEntryPrefab.GetComponent<LayoutElement>().minHeight +
-                              m_EntryLayoutGroup.spacing;
-            m_ScrollElement.minHeight = m_MaxPartySize * entryHeight;
+            var contentSize = m_EntryLayoutGroup.padding.vertical +
+                m_Partysize *
+                (m_EntryLayoutGroup.spacing +
+                    m_PartyEntryPrefab.GetComponent<RectTransform>().rect.height);
 
-            var panelSpacing = m_PartyLayoutGroup.spacing;
-            var panelPadding = m_PartyLayoutGroup.padding.top + m_PartyLayoutGroup.padding.bottom;
-            var scrollSize = m_MaxPartySize * entryHeight + panelSpacing;
-            var buttonHeight = m_ButtonPanel.minHeight + panelSpacing;
-            var panelSize = scrollSize + buttonHeight + panelPadding;
-
-            gameObject.GetComponent<RectTransform>()
-                      .SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, panelSize);
+            m_ScrollLayout.minHeight = contentSize;
         }
+
         void SetAllEmpty()
         {
             foreach (var entry in m_PartyEntryViews)
@@ -100,25 +82,13 @@ namespace Unity.Services.Samples.Parties
                     remotePlayerView = nonLocalPlayerViews.First();
                     nonLocalPlayerViews.RemoveAt(0);
                 }
+
                 //Overwrite the Kick action, since the players could shuffle around, we want to make sure the button kicks the current player.
                 if (imHost)
                     remotePlayerView.OnKickClicked = () => OnKickClicked?.Invoke(player.Id);
 
                 remotePlayerView.Refresh(player, imHost);
-
             }
-        }
-
-        void OnReady()
-        {
-            OnReadyClicked?.Invoke();
-            m_ReadyButton.gameObject.SetActive(false);
-        }
-
-        void OnUnready()
-        {
-            OnUnReadyClicked?.Invoke();
-            m_ReadyButton.gameObject.SetActive(true);
         }
     }
 }
