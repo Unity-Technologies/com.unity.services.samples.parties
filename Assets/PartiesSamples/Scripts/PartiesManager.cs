@@ -91,8 +91,9 @@ namespace Unity.Services.Samples.Parties
                     Player = m_LocalPlayer
                 };
                 var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
-                m_PartyLobby =
-                    await LobbyService.Instance.CreateLobbyAsync(partyLobbyName, k_MaxPartyMembers, partyLobbyOptions);
+                m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
+                        k_MaxPartyMembers,
+                        partyLobbyOptions);
                 await OnJoinedParty(m_PartyLobby);
             }
             catch (LobbyServiceException e)
@@ -109,12 +110,14 @@ namespace Unity.Services.Samples.Parties
                 {
                     Player = m_LocalPlayer
                 };
+
                 m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, joinOptions);
                 await OnJoinedParty(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
-                Debug.Log(e);
+                var joinFailMessage = $"{e.Reason}, {e.Message}";
+                m_JoinPartyPopupPopupView.JoinPartyFailed(joinFailMessage);
             }
         }
 
