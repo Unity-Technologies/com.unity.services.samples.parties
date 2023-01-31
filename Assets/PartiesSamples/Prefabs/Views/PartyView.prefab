@@ -357,7 +357,7 @@ MonoBehaviour:
   m_ButtonPanel: {fileID: 3423164246266903084}
   m_InGameJoinCode: {fileID: 1149159612838700724}
   m_ReadyButton: {fileID: 3942503932832709828}
-  m_UnReadyButton: {fileID: 6198416623337341069}
+  m_CancelButton: {fileID: 6198416623337341069}
   m_CopyButton: {fileID: 2702950877408268487}
   m_LeaveButton: {fileID: 297510409472843683}
 --- !u!1 &4006675170322903072
@@ -1088,15 +1088,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8988316349280258739, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_fontSize
-      value: 20
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
---- !u!224 &7384673154184911413 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 4763711307451258996, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
-  m_PrefabInstance: {fileID: 2623271098315883073}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &3942503932832709828 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1355914827498274437, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
@@ -1108,6 +1103,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!224 &7384673154184911413 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4763711307451258996, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
+  m_PrefabInstance: {fileID: 2623271098315883073}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &4959622410222321160
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1177,7 +1177,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2343128413502425157, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_Name
-      value: UnreadyButton
+      value: CancelButton
       objectReference: {fileID: 0}
     - target: {fileID: 4763711307451258996, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_Pivot.x
@@ -1265,7 +1265,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8988316349280258739, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_fontSize
-      value: 20
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
@@ -1390,6 +1390,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 541ea008e06d94b4ea1bf34acaea5b39, type: 3}
+--- !u!224 &6119775410130581842 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 580958939626383479, guid: 541ea008e06d94b4ea1bf34acaea5b39, type: 3}
+  m_PrefabInstance: {fileID: 6692969566429270309}
+  m_PrefabAsset: {fileID: 0}
 --- !u!114 &297510409472843683 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6395899237562338950, guid: 541ea008e06d94b4ea1bf34acaea5b39, type: 3}
@@ -1401,11 +1406,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!224 &6119775410130581842 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 580958939626383479, guid: 541ea008e06d94b4ea1bf34acaea5b39, type: 3}
-  m_PrefabInstance: {fileID: 6692969566429270309}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &8653610611799982009
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1443,7 +1443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8639434144123899264, guid: 25c7ec8e5f91fb9479a3c21d73e190e6, type: 3}
       propertyPath: m_fontSize
-      value: 22
+      value: 18
       objectReference: {fileID: 0}
     - target: {fileID: 8639434145880774915, guid: 25c7ec8e5f91fb9479a3c21d73e190e6, type: 3}
       propertyPath: m_Name

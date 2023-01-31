@@ -232,7 +232,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 0.972549, g: 0.5882353, b: 0.21960784, a: 1}
+    m_NormalColor: {r: 0.9686275, g: 0.7137255, b: 0.34901962, a: 1}
     m_HighlightedColor: {r: 1, g: 0.7847803, b: 0.5801887, a: 1}
     m_PressedColor: {r: 0.823, g: 0.48411766, b: 0.15814508, a: 1}
     m_SelectedColor: {r: 0.49411765, g: 0.827451, b: 0.12941177, a: 1}
