@@ -13,6 +13,7 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] VerticalLayoutGroup m_EntryLayoutGroup;
         [SerializeField] PartyEntryView m_PartyEntryPrefab;
         [SerializeField] LayoutElement m_ScrollLayout;
+        [SerializeField] int m_MaxPartyWindowHeight = 500;
 
         List<PartyEntryView> m_PartyEntryViews = new List<PartyEntryView>();
         int m_Partysize = 1;
@@ -31,13 +32,13 @@ namespace Unity.Services.Samples.Parties
 
         public void Show()
         {
-            m_ScrollLayout.gameObject.SetActive(true);
+            gameObject.SetActive(true);
             GrowScrollListToContent();
         }
 
         public void Hide()
         {
-            m_ScrollLayout.gameObject.SetActive(false);
+            gameObject.SetActive(false);
             m_ScrollLayout.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
         }
 
@@ -48,7 +49,8 @@ namespace Unity.Services.Samples.Parties
                 m_Partysize *
                 (m_EntryLayoutGroup.spacing +
                     m_PartyEntryPrefab.GetComponent<RectTransform>().rect.height);
-
+            //Leave Space for Ready Button on bottom
+            contentSize = Mathf.Clamp(contentSize, 0, m_MaxPartyWindowHeight);
             m_ScrollLayout.minHeight = contentSize;
         }
 

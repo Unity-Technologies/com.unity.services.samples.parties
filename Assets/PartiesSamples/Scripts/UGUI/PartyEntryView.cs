@@ -27,12 +27,8 @@ namespace Unity.Services.Samples.Parties
         public void Refresh(PartyPlayer playerData, bool imHost)
         {
             m_NameText.text = playerData.Name;
-
-            m_EmptyPartyContentPanel.SetActive(false);
-
-            m_PlayerContentPanel.SetActive(true);
-            m_ReadyPanelText.SetActive(playerData.IsReady);
-            m_NotReadyTextPanel.SetActive(!playerData.IsReady);
+            ShowPlayer(true);
+            SetReady(playerData.IsReady);
             m_HostCrown.SetActive(playerData.IsHost);
 
             if (imHost && !playerData.IsLocalPlayer)
@@ -42,13 +38,23 @@ namespace Unity.Services.Samples.Parties
         public void SetEmpty()
         {
             m_NameText.text = "Empty";
-            m_EmptyPartyContentPanel.SetActive(true);
-
-            m_PlayerContentPanel.SetActive(false);
-            m_ReadyPanelText.SetActive(false);
-            m_NotReadyTextPanel.SetActive(true);
+            ShowPlayer(false);
+            SetReady(false);
             m_HostCrown.SetActive(false);
             m_ButtonPanel.SetActive(false);
         }
+
+        void ShowPlayer(bool show)
+        {
+            m_PlayerContentPanel.SetActive(show);
+            m_EmptyPartyContentPanel.SetActive(!show);
+        }
+
+        void SetReady(bool isReady)
+        {
+            m_ReadyPanelText.SetActive(isReady);
+            m_NotReadyTextPanel.SetActive(!isReady);
+        }
+
     }
 }

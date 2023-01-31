@@ -9,10 +9,13 @@ namespace Unity.Services.Samples.Parties
     /// </summary>
     public class PartyPlayer : Player
     {
-        public string Name => Data[nameof(Name)].Value;
-        public bool IsReady => bool.Parse(Data[nameof(IsReady)].Value);
+        public string Name => Data[k_NameKey].Value;
+        public bool IsReady => bool.Parse(Data[k_ReadyKey].Value);
         [field: SerializeField] public bool IsHost { get; private set; }
         [field: SerializeField] public bool IsLocalPlayer { get; private set; }
+        
+        const string k_NameKey = nameof(Name);
+        const string k_ReadyKey = nameof(IsReady);
 
         public PartyPlayer(Player player)
             : base(player.Id)
@@ -26,10 +29,10 @@ namespace Unity.Services.Samples.Parties
             Data = new Dictionary<string, PlayerDataObject>
             {
                 {
-                    nameof(Name), new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name)
+                    k_NameKey, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name)
                 },
                 {
-                    nameof(IsReady), new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "false")
+                    k_ReadyKey, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "false")
                 }
             };
 
@@ -43,7 +46,7 @@ namespace Unity.Services.Samples.Parties
 
         public void SetReady(bool ready)
         {
-            Data[nameof(IsReady)].Value = $"{ready}";
+            Data[k_ReadyKey].Value = $"{ready}";
         }
 
         public void SetLocalPlayer(bool isLocalPlayer)
