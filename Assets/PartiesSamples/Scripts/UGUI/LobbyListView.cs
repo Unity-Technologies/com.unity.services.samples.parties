@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
@@ -10,19 +9,21 @@ namespace Unity.Services.Samples.Parties
     public class LobbyListView : MonoBehaviour
     {
         public event Action<string> OnKickClicked;
+        public event Action<string> OnHostClicked;
 
-        [SerializeField] VerticalLayoutGroup m_EntryLayoutGroup;
+        [SerializeField] VerticalLayoutGroup m_ContentLayoutGroup;
         [SerializeField] LobbyEntryView m_LobbyEntryPrefab;
         [SerializeField] LayoutElement m_ScrollLayout;
         [SerializeField] int m_MaxLobbyWindowHeight = 500;
 
         List<LobbyEntryView> m_PartyEntryViews = new List<LobbyEntryView>();
         int m_Partysize = 1;
+
         public void Init(int maxPartySize)
         {
             for (int i = 0; i < maxPartySize; i++)
             {
-                var entry = Instantiate(m_LobbyEntryPrefab, m_EntryLayoutGroup.transform);
+                var entry = Instantiate(m_LobbyEntryPrefab, m_ContentLayoutGroup.transform);
                 m_PartyEntryViews.Add(entry);
                 entry.Init();
             }
@@ -46,10 +47,13 @@ namespace Unity.Services.Samples.Parties
         //Combine the heights of the elements to create the right size of the party
         void GrowScrollListToContent()
         {
-            var contentSize = m_EntryLayoutGroup.padding.vertical +
-                m_Partysize *
-                (m_EntryLayoutGroup.spacing +
-                    m_LobbyEntryPrefab.GetComponent<RectTransform>().rect.height);
+            float contentSize = m_ContentLayoutGroup.padding.vertical;
+            foreach (var entry in m_PartyEntryViews)
+            {
+                contentSize += entry.GetComponent<RectTransform>().rect.height;
+                contentSize += m_ContentLayoutGroup.spacing;
+            }
+
             //Leave Space for Ready Button on bottom
             contentSize = Mathf.Clamp(contentSize, 0, m_MaxLobbyWindowHeight);
             m_ScrollLayout.minHeight = contentSize;
@@ -88,7 +92,10 @@ namespace Unity.Services.Samples.Parties
 
                 //Overwrite the Kick action, since the players could shuffle around, we want to make sure the button kicks the current player.
                 if (imHost)
+                {
                     remotePlayerView.OnKickClicked = () => OnKickClicked?.Invoke(player.Id);
+                    remotePlayerView.OnHostClicked = () => OnHostClicked?.Invoke(player.Id);
+                }
 
                 remotePlayerView.Refresh(player, imHost);
             }

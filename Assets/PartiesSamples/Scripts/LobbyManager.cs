@@ -7,7 +7,6 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
-
 namespace Unity.Services.Samples.Parties
 {
     /// <summary>
@@ -40,7 +39,6 @@ namespace Unity.Services.Samples.Parties
         /// </summary>
         async Task Authenticate()
         {
-
             //We can test locally out-of the box with one Editor and one Build.
             //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
             // per instance.
@@ -70,9 +68,11 @@ namespace Unity.Services.Samples.Parties
             m_LobbyView.Init();
             m_LobbyView.OnLeaveClicked += OnLeaveLobby;
             m_LobbyView.OnReadyClicked += OnReadyClicked;
+
             //Party List
             m_LobbyListView.Init(m_MaxPartyMembers);
-            m_LobbyListView.OnKickClicked += OnKickedFromLobby;
+            m_LobbyListView.OnKickClicked += OnKickFromLobby;
+            m_LobbyListView.OnHostClicked += OnSetHost;
         }
 
         async void CreateLobby()
@@ -86,8 +86,8 @@ namespace Unity.Services.Samples.Parties
                 };
                 var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
-                        m_MaxPartyMembers,
-                        partyLobbyOptions);
+                    m_MaxPartyMembers,
+                    partyLobbyOptions);
                 await OnJoinedParty(m_PartyLobby);
             }
             catch (LobbyServiceException e)
@@ -120,6 +120,25 @@ namespace Unity.Services.Samples.Parties
             try
             {
                 await LobbyService.Instance.RemovePlayerAsync(m_PartyLobby.Id, playerID);
+            }
+            catch (LobbyServiceException e)
+            {
+                Debug.Log(e);
+            }
+        }
+
+
+        async Task TrySetHost(string playerId)
+        {
+            if (!m_LocalPlayer.IsHost)
+                return;
+            try
+            {
+                var setHostOptions = new UpdateLobbyOptions()
+                {
+                    HostId = playerId
+                };
+                await LobbyService.Instance.UpdateLobbyAsync(m_PartyLobby.Id, setHostOptions);
             }
             catch (LobbyServiceException e)
             {
@@ -183,10 +202,16 @@ namespace Unity.Services.Samples.Parties
             m_LobbyListView.Refresh(partyPlayers, m_LocalPlayer.IsHost);
         }
 
-        async void OnKickedFromLobby(string playerId)
+        async void OnKickFromLobby(string playerId)
         {
             await RemoveFromParty(playerId);
         }
+
+        async void OnSetHost(string playerId)
+        {
+            await TrySetHost(playerId);
+        }
+
 
         void OnPartyChanged(ILobbyChanges changes)
         {
@@ -246,6 +271,5 @@ namespace Unity.Services.Samples.Parties
                 Debug.Log(e);
             }
         }
-
     }
 }
