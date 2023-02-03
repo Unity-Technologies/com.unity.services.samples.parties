@@ -150,10 +150,11 @@ namespace Unity.Services.Samples.Parties
         {
             m_LobbyView.JoinParty(lobby.LobbyCode);
             m_LobbyJoinCreateView.Hide();
+            m_LobbyJoinPopupPopupView.Hide();
             m_LobbyListView.Show();
 
             UpdatePlayers(lobby.Players, lobby.HostId);
-            m_PartyEventCallbacks.LobbyChanged += OnPartyChanged;
+            m_PartyEventCallbacks.LobbyChanged += OnLobbyChanged;
             m_PartyEventCallbacks.KickedFromLobby += OnKickedFromParty;
 
             await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
@@ -170,7 +171,7 @@ namespace Unity.Services.Samples.Parties
 
         void OnLeftParty()
         {
-            m_PartyEventCallbacks.LobbyChanged -= OnPartyChanged;
+            m_PartyEventCallbacks.LobbyChanged -= OnLobbyChanged;
             m_PartyEventCallbacks.KickedFromLobby -= OnKickedFromParty;
             m_LobbyJoinCreateView.Show();
             m_LobbyView.LeftParty();
@@ -213,7 +214,7 @@ namespace Unity.Services.Samples.Parties
         }
 
 
-        void OnPartyChanged(ILobbyChanges changes)
+        void OnLobbyChanged(ILobbyChanges changes)
         {
             Debug.Log($"Lobby changed");
             if (changes.LobbyDeleted)

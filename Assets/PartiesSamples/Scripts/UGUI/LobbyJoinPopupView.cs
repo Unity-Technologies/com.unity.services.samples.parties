@@ -49,15 +49,15 @@ namespace Unity.Services.Samples.Parties
             m_ErrorPanel.SetActive(false);
         }
 
-        void ValidateInputCode(string inputCode)
-        {
-            m_JoinButton.interactable = inputCode.Length == k_GameCodeLength && k_AlphaNumeric.IsMatch(inputCode);
-        }
-
-        void Hide()
+        public void Hide()
         {
             gameObject.SetActive(false);
             m_ErrorPanel.SetActive(false);
+        }
+
+        void ValidateInputCode(string inputCode)
+        {
+            m_JoinButton.interactable = inputCode.Length == k_GameCodeLength && k_AlphaNumeric.IsMatch(inputCode);
         }
     }
 }

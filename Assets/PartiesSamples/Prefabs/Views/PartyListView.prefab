@@ -465,7 +465,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e88ea670077b1441584e629bf0110d29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_EntryLayoutGroup: {fileID: 1502714406248954562}
+  m_ContentLayoutGroup: {fileID: 1502714406248954562}
   m_LobbyEntryPrefab: {fileID: 6900440754979876670, guid: 96b570de9a05fef4084ceb28ecce0d3f, type: 3}
   m_ScrollLayout: {fileID: 2263202421526477745}
   m_MaxLobbyWindowHeight: 500

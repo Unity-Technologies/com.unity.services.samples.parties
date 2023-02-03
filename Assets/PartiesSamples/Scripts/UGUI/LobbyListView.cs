@@ -1,6 +1,8 @@
 using System;
+using System.Collections;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -17,7 +19,6 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] int m_MaxLobbyWindowHeight = 500;
 
         List<LobbyEntryView> m_PartyEntryViews = new List<LobbyEntryView>();
-        int m_Partysize = 1;
 
         public void Init(int maxPartySize)
         {
@@ -28,29 +29,30 @@ namespace Unity.Services.Samples.Parties
                 entry.Init();
             }
 
-            m_Partysize = maxPartySize;
             Hide();
         }
 
         public void Show()
         {
             gameObject.SetActive(true);
-            GrowScrollListToContent();
+            StartCoroutine(GrowScrollListToContent());
         }
 
         public void Hide()
         {
             gameObject.SetActive(false);
-            m_ScrollLayout.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 0);
+            m_ScrollLayout.minHeight = 0;
         }
 
         //Combine the heights of the elements to create the right size of the party
-        void GrowScrollListToContent()
+        //Needs to be run on the next frame after canvas has settled the sizes.
+        IEnumerator GrowScrollListToContent()
         {
+            yield return new WaitForEndOfFrame();
             float contentSize = m_ContentLayoutGroup.padding.vertical;
             foreach (var entry in m_PartyEntryViews)
             {
-                contentSize += entry.GetComponent<RectTransform>().rect.height;
+                contentSize += entry.RectTransform.rect.height;
                 contentSize += m_ContentLayoutGroup.spacing;
             }
 
@@ -99,6 +101,8 @@ namespace Unity.Services.Samples.Parties
 
                 remotePlayerView.Refresh(player, imHost);
             }
+
+            StartCoroutine(GrowScrollListToContent());
         }
     }
 }

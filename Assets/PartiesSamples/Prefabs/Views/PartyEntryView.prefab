@@ -61,6 +61,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8149df383bf047f59ad887aee0776f9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <RectTransform>k__BackingField: {fileID: 5708610368678312172}
   m_EmptyPartyContentPanel: {fileID: 4678576438156501781}
   m_PlayerContentPanel: {fileID: 5258786834238762939}
   m_NotReadyTextPanel: {fileID: 6239917576534094714}

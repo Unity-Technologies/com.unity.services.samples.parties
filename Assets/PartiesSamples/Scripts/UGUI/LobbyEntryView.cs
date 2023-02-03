@@ -9,7 +9,7 @@ namespace Unity.Services.Samples.Parties
     {
         public Action OnKickClicked;
         public Action OnHostClicked;
-
+        [field: SerializeField] public RectTransform RectTransform { get; private set; }
         [SerializeField] GameObject m_EmptyPartyContentPanel;
         [SerializeField] GameObject m_PlayerContentPanel;
         [SerializeField] GameObject m_NotReadyTextPanel;
@@ -20,6 +20,8 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] Button m_KickButton;
         [SerializeField] Button m_HostButton;
 
+
+        Rect m_EntryRect;
         public void Init()
         {
             m_KickButton.onClick.AddListener(() => OnKickClicked?.Invoke());
