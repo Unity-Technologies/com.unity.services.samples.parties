@@ -5,9 +5,8 @@ using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
-using Unity.Services.Samples.Utilities;
 using UnityEngine;
-using UnityEngine.Serialization;
+
 
 namespace Unity.Services.Samples.Parties
 {
@@ -41,8 +40,11 @@ namespace Unity.Services.Samples.Parties
         /// </summary>
         async Task Authenticate()
         {
-            var authOptions = AuthUtility.TryCreateEditorTestingProfile();
-            await UnityServices.InitializeAsync(authOptions);
+
+            //We can test locally out-of the box with one Editor and one Build.
+            //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
+            // per instance.
+            await UnityServices.InitializeAsync();
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
