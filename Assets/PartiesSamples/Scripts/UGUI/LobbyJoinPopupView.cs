@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
-    public class JoinPartyPopupView : MonoBehaviour
+    public class LobbyJoinPopupView : MonoBehaviour
     {
         [SerializeField] Button m_JoinButton = null;
         [SerializeField] Button m_CloseButton = null;

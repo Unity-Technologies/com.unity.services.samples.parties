@@ -115,10 +115,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7ee1aab4cd943b4ba0a8c0cddd44fd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_PartyJoinCreateView: {fileID: 8255814792563752221}
-  m_PartyView: {fileID: 3136909830984599707}
-  m_PartyListView: {fileID: 2346433896486384294}
-  m_JoinPartyPopupPopupView: {fileID: 5266334136655094806}
+  m_LobbyJoinCreateView: {fileID: 8255814792563752221}
+  m_LobbyView: {fileID: 3136909830984599707}
+  m_LobbyListView: {fileID: 2346433896486384294}
+  m_LobbyJoinPopupPopupView: {fileID: 5266334136655094806}
   m_NotificationStackView: {fileID: 3039965980699112350}
   m_MaxPartyMembers: 4
 --- !u!1001 &3433835832891883496

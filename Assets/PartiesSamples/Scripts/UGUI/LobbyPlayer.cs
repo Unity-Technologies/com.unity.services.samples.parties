@@ -7,7 +7,7 @@ namespace Unity.Services.Samples.Parties
     /// <summary>
     /// In order to make the custom fields easier to work with, we extend the Lobby's player class
     /// </summary>
-    public class PartyPlayer : Player
+    public class LobbyPlayer : Player
     {
         public string Name => Data[k_NameKey].Value;
         public bool IsReady => bool.Parse(Data[k_ReadyKey].Value);
@@ -17,13 +17,13 @@ namespace Unity.Services.Samples.Parties
         const string k_NameKey = nameof(Name);
         const string k_ReadyKey = nameof(IsReady);
 
-        public PartyPlayer(Player player)
+        public LobbyPlayer(Player player)
             : base(player.Id)
         {
             Data = player.Data;
         }
 
-        public PartyPlayer(string playerID, string name, bool isLocalPlayer)
+        public LobbyPlayer(string playerID, string name, bool isLocalPlayer)
             : base(playerID)
         {
             Data = new Dictionary<string, PlayerDataObject>

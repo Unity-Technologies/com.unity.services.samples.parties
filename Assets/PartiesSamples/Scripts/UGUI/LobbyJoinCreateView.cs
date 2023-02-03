@@ -3,16 +3,16 @@ using UnityEngine;
 using UnityEngine.UI;
 namespace Unity.Services.Samples.Parties
 {
-    public class PartyJoinCreateView : MonoBehaviour
+    public class LobbyJoinCreateView : MonoBehaviour
     {
-        public event Action OnJoinPartyClicked;
+        public event Action OnJoinClicked;
         public event Action OnCreateClicked;
         [SerializeField] Button m_JoinButton;
         [SerializeField] Button m_CreateButton;
 
         public void Init()
         {
-            m_JoinButton.onClick.AddListener(() => OnJoinPartyClicked?.Invoke());
+            m_JoinButton.onClick.AddListener(() => OnJoinClicked?.Invoke());
             m_CreateButton.onClick.AddListener(() => OnCreateClicked?.Invoke());
         }
 

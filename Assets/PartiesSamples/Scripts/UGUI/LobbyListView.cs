@@ -2,26 +2,27 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
-    public class PartyListView : MonoBehaviour
+    public class LobbyListView : MonoBehaviour
     {
         public event Action<string> OnKickClicked;
 
         [SerializeField] VerticalLayoutGroup m_EntryLayoutGroup;
-        [SerializeField] PartyEntryView m_PartyEntryPrefab;
+        [SerializeField] LobbyEntryView m_LobbyEntryPrefab;
         [SerializeField] LayoutElement m_ScrollLayout;
-        [SerializeField] int m_MaxPartyWindowHeight = 500;
+        [SerializeField] int m_MaxLobbyWindowHeight = 500;
 
-        List<PartyEntryView> m_PartyEntryViews = new List<PartyEntryView>();
+        List<LobbyEntryView> m_PartyEntryViews = new List<LobbyEntryView>();
         int m_Partysize = 1;
         public void Init(int maxPartySize)
         {
             for (int i = 0; i < maxPartySize; i++)
             {
-                var entry = Instantiate(m_PartyEntryPrefab, m_EntryLayoutGroup.transform);
+                var entry = Instantiate(m_LobbyEntryPrefab, m_EntryLayoutGroup.transform);
                 m_PartyEntryViews.Add(entry);
                 entry.Init();
             }
@@ -48,9 +49,9 @@ namespace Unity.Services.Samples.Parties
             var contentSize = m_EntryLayoutGroup.padding.vertical +
                 m_Partysize *
                 (m_EntryLayoutGroup.spacing +
-                    m_PartyEntryPrefab.GetComponent<RectTransform>().rect.height);
+                    m_LobbyEntryPrefab.GetComponent<RectTransform>().rect.height);
             //Leave Space for Ready Button on bottom
-            contentSize = Mathf.Clamp(contentSize, 0, m_MaxPartyWindowHeight);
+            contentSize = Mathf.Clamp(contentSize, 0, m_MaxLobbyWindowHeight);
             m_ScrollLayout.minHeight = contentSize;
         }
 
@@ -64,19 +65,19 @@ namespace Unity.Services.Samples.Parties
         /// Assumes an ordered player list from the lobby. We always want to show the player in EntryView 0,
         /// If you are the host, you get special actions visible to you.
         /// </summary>
-        public void Refresh(List<PartyPlayer> players, bool imHost)
+        public void Refresh(List<LobbyPlayer> players, bool imHost)
         {
             SetAllEmpty();
             var localPlayerEntry = m_PartyEntryViews.First();
 
             //Copy the view list without the player
-            var nonLocalPlayerViews = new List<PartyEntryView>(m_PartyEntryViews);
+            var nonLocalPlayerViews = new List<LobbyEntryView>(m_PartyEntryViews);
             nonLocalPlayerViews.Remove(localPlayerEntry);
 
             //Players are ordered by the Lobby SDK
             foreach (var player in players)
             {
-                PartyEntryView remotePlayerView = null;
+                LobbyEntryView remotePlayerView = null;
                 if (player.IsLocalPlayer)
                     remotePlayerView = localPlayerEntry;
                 else

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
-    public class PartyEntryView : MonoBehaviour
+    public class LobbyEntryView : MonoBehaviour
     {
         public Action OnKickClicked;
         [SerializeField] GameObject m_EmptyPartyContentPanel;
@@ -24,7 +24,7 @@ namespace Unity.Services.Samples.Parties
         }
 
         //We only refresh active players,
-        public void Refresh(PartyPlayer playerData, bool imHost)
+        public void Refresh(LobbyPlayer playerData, bool imHost)
         {
             m_NameText.text = playerData.Name;
             ShowPlayer(true);

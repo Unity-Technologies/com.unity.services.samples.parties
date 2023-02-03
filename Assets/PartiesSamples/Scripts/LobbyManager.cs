@@ -7,25 +7,26 @@ using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using Unity.Services.Samples.Utilities;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Unity.Services.Samples.Parties
 {
     /// <summary>
     /// Wraps around the Lobby SDK to create a party-like experience.
     /// </summary>
-    public class PartiesManager : MonoBehaviour
+    public class LobbyManager : MonoBehaviour
     {
-        [SerializeField] PartyJoinCreateView m_PartyJoinCreateView;
-        [SerializeField] PartyView m_PartyView;
-        [SerializeField] PartyListView m_PartyListView;
-        [SerializeField] JoinPartyPopupView m_JoinPartyPopupPopupView;
+        [SerializeField] LobbyJoinCreateView m_LobbyJoinCreateView;
+        [SerializeField] LobbyView m_LobbyView;
+        [SerializeField] LobbyListView m_LobbyListView;
+        [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
         [SerializeField] NotificationStackView m_NotificationStackView;
         [SerializeField] int m_MaxPartyMembers = 4;
         const string k_PartyNamePrefix = "Party";
         const string k_LocalPlayerNamePrefix = "Player";
 
         Lobby m_PartyLobby;
-        PartyPlayer m_LocalPlayer;
+        LobbyPlayer m_LocalPlayer;
         LobbyEventCallbacks m_PartyEventCallbacks = new LobbyEventCallbacks();
 
         async void Start()
@@ -49,30 +50,30 @@ namespace Unity.Services.Samples.Parties
         {
             var id = AuthenticationService.Instance.PlayerId;
             var localPlayerName = $"{k_LocalPlayerNamePrefix}_{id}";
-            m_LocalPlayer = new PartyPlayer(id, localPlayerName, true);
+            m_LocalPlayer = new LobbyPlayer(id, localPlayerName, true);
         }
 
         void UIInit()
         {
             //Join Party Popup
-            m_JoinPartyPopupPopupView.Init();
-            m_JoinPartyPopupPopupView.OnJoinClicked += TryJoin;
+            m_LobbyJoinPopupPopupView.Init();
+            m_LobbyJoinPopupPopupView.OnJoinClicked += TryLobbyJoin;
 
             //Party Join/Create
-            m_PartyJoinCreateView.Init();
-            m_PartyJoinCreateView.OnJoinPartyClicked += () => m_JoinPartyPopupPopupView.Show();
-            m_PartyJoinCreateView.OnCreateClicked += CreateParty;
+            m_LobbyJoinCreateView.Init();
+            m_LobbyJoinCreateView.OnJoinClicked += () => m_LobbyJoinPopupPopupView.Show();
+            m_LobbyJoinCreateView.OnCreateClicked += CreateLobby;
 
             //In-Party
-            m_PartyView.Init();
-            m_PartyView.OnLeaveClicked += OnLeaveParty;
-            m_PartyView.OnReadyClicked += OnReadyClicked;
+            m_LobbyView.Init();
+            m_LobbyView.OnLeaveClicked += OnLeaveLobby;
+            m_LobbyView.OnReadyClicked += OnReadyClicked;
             //Party List
-            m_PartyListView.Init(m_MaxPartyMembers);
-            m_PartyListView.OnKickClicked += OnKickedFromParty;
+            m_LobbyListView.Init(m_MaxPartyMembers);
+            m_LobbyListView.OnKickClicked += OnKickedFromLobby;
         }
 
-        async void CreateParty()
+        async void CreateLobby()
         {
             try
             {
@@ -93,7 +94,7 @@ namespace Unity.Services.Samples.Parties
             }
         }
 
-        async void TryJoin(string joinCode)
+        async void TryLobbyJoin(string joinCode)
         {
             try
             {
@@ -108,7 +109,7 @@ namespace Unity.Services.Samples.Parties
             catch (LobbyServiceException e)
             {
                 var joinFailMessage = $"{e.Reason}, {e.Message}";
-                m_JoinPartyPopupPopupView.JoinPartyFailed(joinFailMessage);
+                m_LobbyJoinPopupPopupView.JoinPartyFailed(joinFailMessage);
             }
         }
 
@@ -126,9 +127,9 @@ namespace Unity.Services.Samples.Parties
 
         async Task OnJoinedParty(Lobby lobby)
         {
-            m_PartyView.JoinParty(lobby.LobbyCode);
-            m_PartyJoinCreateView.Hide();
-            m_PartyListView.Show();
+            m_LobbyView.JoinParty(lobby.LobbyCode);
+            m_LobbyJoinCreateView.Hide();
+            m_LobbyListView.Show();
 
             UpdatePlayers(lobby.Players, lobby.HostId);
             m_PartyEventCallbacks.LobbyChanged += OnPartyChanged;
@@ -137,7 +138,7 @@ namespace Unity.Services.Samples.Parties
             await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
         }
 
-        async void OnLeaveParty()
+        async void OnLeaveLobby()
         {
             await RemoveFromParty(m_LocalPlayer.Id);
             Debug.Log($"Lobby changed");
@@ -150,18 +151,18 @@ namespace Unity.Services.Samples.Parties
         {
             m_PartyEventCallbacks.LobbyChanged -= OnPartyChanged;
             m_PartyEventCallbacks.KickedFromLobby -= OnKickedFromParty;
-            m_PartyJoinCreateView.Show();
-            m_PartyView.LeftParty();
-            m_PartyListView.Hide();
+            m_LobbyJoinCreateView.Show();
+            m_LobbyView.LeftParty();
+            m_LobbyListView.Hide();
         }
 
         void UpdatePlayers(List<Player> players, string hostID)
         {
-            var partyPlayers = new List<PartyPlayer>();
+            var partyPlayers = new List<LobbyPlayer>();
             int readyCount = 0;
             foreach (var player in players)
             {
-                var partyPlayer = new PartyPlayer(player);
+                var partyPlayer = new LobbyPlayer(player);
 
                 partyPlayer.SetLocalPlayer(player.Id == m_LocalPlayer.Id);
                 if (partyPlayer.IsLocalPlayer)
@@ -177,10 +178,10 @@ namespace Unity.Services.Samples.Parties
             if (readyCount >= partyPlayers.Count)
                 AllMembersReady(partyPlayers);
 
-            m_PartyListView.Refresh(partyPlayers, m_LocalPlayer.IsHost);
+            m_LobbyListView.Refresh(partyPlayers, m_LocalPlayer.IsHost);
         }
 
-        async void OnKickedFromParty(string playerId)
+        async void OnKickedFromLobby(string playerId)
         {
             await RemoveFromParty(playerId);
         }
@@ -199,7 +200,7 @@ namespace Unity.Services.Samples.Parties
             {
                 foreach (var player in changes.PlayerLeft.Value)
                 {
-                    var leftPlayer = new PartyPlayer(m_PartyLobby.Players[player]);
+                    var leftPlayer = new LobbyPlayer(m_PartyLobby.Players[player]);
                     m_NotificationStackView.CreateNotification(1,
                         leftPlayer.Name,
                         "Left the Party!");
@@ -211,7 +212,7 @@ namespace Unity.Services.Samples.Parties
             UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
         }
 
-        void AllMembersReady(List<PartyPlayer> members)
+        void AllMembersReady(List<LobbyPlayer> members)
         {
             Debug.Log($"All {members.Count} party Members Ready!");
         }
