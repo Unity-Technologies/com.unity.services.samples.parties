@@ -6,6 +6,7 @@ using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
@@ -19,38 +20,57 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] LobbyListView m_LobbyListView;
         [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
         [SerializeField] NotificationStackView m_NotificationStackView;
+        [SerializeField] NameChangeView m_NameChangeView;
+        [SerializeField] string m_PlayerProfileName = "NewPlayer";
         [SerializeField] int m_MaxPartyMembers = 4;
         const string k_PartyNamePrefix = "Party";
         const string k_LocalPlayerNamePrefix = "Player";
 
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
-        LobbyEventCallbacks m_PartyEventCallbacks = new LobbyEventCallbacks();
+        LobbyEventCallbacks m_PartyEventCallbacks;
 
         async void Start()
         {
-            await Authenticate();
-            CreateLocalPlayer();
+            await Authenticate(m_PlayerProfileName);
+            CreateLocalPlayer(m_PlayerProfileName);
             UIInit();
+            m_PartyEventCallbacks= new LobbyEventCallbacks();
         }
 
         /// <summary>
         /// If you are already Authenticating somewhere else, this step can be skipped.
         /// </summary>
-        async Task Authenticate()
+        async Task Authenticate(string playerName)
         {
             //We can test locally out-of the box with one Editor and one Build.
             //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
             // per instance.
-            await UnityServices.InitializeAsync();
+            var initOptions = new InitializationOptions();
+            initOptions.SetProfile(playerName);
+
+            await UnityServices.InitializeAsync(initOptions);
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
         }
 
-        void CreateLocalPlayer()
+        string LoadPlayerName()
+        {
+            string playerName;
+            if (PlayerPrefs.HasKey(LobbyPlayer.nameKey))
+                playerName = PlayerPrefs.GetString(LobbyPlayer.nameKey);
+            else
+            {
+                playerName = m_PlayerProfileName;
+                PlayerPrefs.SetString(LobbyPlayer.nameKey, playerName);
+            }
+
+            return playerName;
+        }
+
+        void CreateLocalPlayer(string playerName)
         {
             var id = AuthenticationService.Instance.PlayerId;
-            var localPlayerName = $"{k_LocalPlayerNamePrefix}_{id}";
-            m_LocalPlayer = new LobbyPlayer(id, localPlayerName, true);
+            m_LocalPlayer = new LobbyPlayer(id, playerName, true);
         }
 
         void UIInit()
@@ -73,6 +93,9 @@ namespace Unity.Services.Samples.Parties
             m_LobbyListView.Init(m_MaxPartyMembers);
             m_LobbyListView.OnKickClicked += OnKickFromLobby;
             m_LobbyListView.OnHostClicked += OnSetHost;
+
+            m_NameChangeView.Init(LoadPlayerName());
+            m_NameChangeView.OnNameChanged += OnNameChanged;
         }
 
         async void CreateLobby()
@@ -127,7 +150,6 @@ namespace Unity.Services.Samples.Parties
             }
         }
 
-
         async Task TrySetHost(string playerId)
         {
             if (!m_LocalPlayer.IsHost)
@@ -155,6 +177,7 @@ namespace Unity.Services.Samples.Parties
 
             UpdatePlayers(lobby.Players, lobby.HostId);
             m_PartyEventCallbacks.LobbyChanged += OnLobbyChanged;
+            m_PartyEventCallbacks.LobbyEventConnectionStateChanged += OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby += OnKickedFromParty;
 
             await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
@@ -163,15 +186,21 @@ namespace Unity.Services.Samples.Parties
         async void OnLeaveLobby()
         {
             await RemoveFromParty(m_LocalPlayer.Id);
-            Debug.Log($"Lobby changed");
+            Debug.Log("Leaving Lobby");
 
             //Leave Lobby Regardless of result
             OnLeftParty();
         }
 
+        void OnLobbyConnectionChanged(LobbyEventConnectionState state)
+        {
+            Debug.Log($"LobbyConnection Changed to {state}");
+        }
+
         void OnLeftParty()
         {
             m_PartyEventCallbacks.LobbyChanged -= OnLobbyChanged;
+            m_PartyEventCallbacks.LobbyEventConnectionStateChanged -= OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby -= OnKickedFromParty;
             m_LobbyJoinCreateView.Show();
             m_LobbyView.LeftParty();
@@ -213,10 +242,16 @@ namespace Unity.Services.Samples.Parties
             await TrySetHost(playerId);
         }
 
+        async void OnNameChanged(string name)
+        {
+            m_LocalPlayer.SetName(name);
+            PlayerPrefs.SetString(LobbyPlayer.nameKey, name);
+
+            await UpdateLocalPlayer();
+        }
 
         void OnLobbyChanged(ILobbyChanges changes)
         {
-            Debug.Log($"Lobby changed");
             if (changes.LobbyDeleted)
             {
                 OnLeftParty();
@@ -250,7 +285,9 @@ namespace Unity.Services.Samples.Parties
             m_NotificationStackView.CreateNotification(1,
                 m_LocalPlayer.Name,
                 "You were removed from the Party!");
+            Debug.Log($"Removed from party!");
             OnLeftParty();
+            ;
         }
 
         async void OnReadyClicked(bool ready)

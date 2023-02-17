@@ -9,12 +9,12 @@ namespace Unity.Services.Samples.Parties
     /// </summary>
     public class LobbyPlayer : Player
     {
-        public string Name => Data[k_NameKey].Value;
+        public string Name => Data[nameKey].Value;
         public bool IsReady => bool.Parse(Data[k_ReadyKey].Value);
         [field: SerializeField] public bool IsHost { get; private set; }
         [field: SerializeField] public bool IsLocalPlayer { get; private set; }
-        
-        const string k_NameKey = nameof(Name);
+
+        public const string nameKey = nameof(Name);
         const string k_ReadyKey = nameof(IsReady);
 
         public LobbyPlayer(Player player)
@@ -29,14 +29,18 @@ namespace Unity.Services.Samples.Parties
             Data = new Dictionary<string, PlayerDataObject>
             {
                 {
-                    k_NameKey, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name)
+                    nameKey, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, name)
                 },
                 {
                     k_ReadyKey, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "false")
                 }
             };
-
             IsLocalPlayer = isLocalPlayer;
+        }
+
+        public void SetName(string name)
+        {
+            Data[nameKey].Value = name;
         }
 
         public void SetHost(bool isHost)
