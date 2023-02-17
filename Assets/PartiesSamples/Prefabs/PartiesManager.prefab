@@ -503,6 +503,26 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 7588862696334289291}
     m_Modifications:
+    - target: {fileID: 8021096178724476894, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021096178724476894, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021096178724476894, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021096178724476894, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8021096178724476894, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8462283486871883368, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
       propertyPath: m_Pivot.x
       value: 1
@@ -537,7 +557,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8462283486871883368, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 90
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8462283486871883368, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
       propertyPath: m_LocalPosition.x
@@ -591,7 +611,12 @@ PrefabInstance:
       propertyPath: m_Name
       value: NotificationStackView
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 8748359368838672798, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
+      propertyPath: m_ChildAlignment
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 8462283486871883369, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 769cd05f0bfb7f342b53202e836d8470, type: 3}
 --- !u!224 &5096212934205759647 stripped
 RectTransform:

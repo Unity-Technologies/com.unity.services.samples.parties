@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 8462283486871883369}
   - component: {fileID: 8748359368838672798}
   - component: {fileID: 1871619089699790185}
+  - component: {fileID: 2705816760344692806}
   m_Layer: 5
   m_Name: NotificationStackView
   m_TagString: Untagged
@@ -64,7 +65,7 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
-  m_AdditionalShaderChannelsFlag: 0
+  m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
@@ -108,3 +109,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_NotificationView: {fileID: 1511833626515646415, guid: 1bcf0f8549444ab4086e14d95b4aabbd, type: 3}
   m_StackParent: {fileID: 8462283486871883368}
+--- !u!114 &2705816760344692806
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8462283486871883371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalFit: 0
+  m_VerticalFit: 2
