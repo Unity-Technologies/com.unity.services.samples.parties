@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.Samples.UX;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
@@ -186,8 +186,8 @@ namespace Unity.Services.Samples.Parties
         async void OnLeaveLobby()
         {
             await RemoveFromParty(m_LocalPlayer.Id);
-            Debug.Log("Leaving Lobby");
-
+            m_NotificationStackView.CreateNotification(1,
+                "You", "left the Party!");
             //Leave Lobby Regardless of result
             OnLeftParty();
         }
@@ -287,7 +287,7 @@ namespace Unity.Services.Samples.Parties
                 "You were removed from the Party!");
             Debug.Log($"Removed from party!");
             OnLeftParty();
-            ;
+
         }
 
         async void OnReadyClicked(bool ready)
