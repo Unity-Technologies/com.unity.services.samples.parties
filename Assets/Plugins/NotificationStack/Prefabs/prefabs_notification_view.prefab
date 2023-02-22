@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 6358149400728107391}
   - component: {fileID: 5182746447620973053}
   m_Layer: 5
-  m_Name: NotificationView
+  m_Name: prefabs_notification_view
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
