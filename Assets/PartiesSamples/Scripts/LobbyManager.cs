@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Unity.Samples.UX;
+using Unity.Samples.UI;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Lobbies;
@@ -19,12 +19,10 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] LobbyView m_LobbyView;
         [SerializeField] LobbyListView m_LobbyListView;
         [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
-        [SerializeField] NotificationStackView m_NotificationStackView;
         [SerializeField] NameChangeView m_NameChangeView;
         [SerializeField] string m_PlayerProfileName = "NewPlayer";
         [SerializeField] int m_MaxPartyMembers = 4;
         const string k_PartyNamePrefix = "Party";
-        const string k_LocalPlayerNamePrefix = "Player";
 
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
@@ -35,7 +33,7 @@ namespace Unity.Services.Samples.Parties
             await Authenticate(m_PlayerProfileName);
             CreateLocalPlayer(m_PlayerProfileName);
             UIInit();
-            m_PartyEventCallbacks= new LobbyEventCallbacks();
+            m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
 
         /// <summary>
@@ -115,7 +113,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.Log(e);
+                Debug.LogError(e);
             }
         }
 
@@ -135,6 +133,7 @@ namespace Unity.Services.Samples.Parties
             {
                 var joinFailMessage = $"{e.Reason}, {e.Message}";
                 m_LobbyJoinPopupPopupView.JoinPartyFailed(joinFailMessage);
+                Debug.LogError(e);
             }
         }
 
@@ -146,7 +145,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.Log(e);
+                Debug.LogError(e);
             }
         }
 
@@ -164,7 +163,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.Log(e);
+                Debug.LogError(e);
             }
         }
 
@@ -186,8 +185,10 @@ namespace Unity.Services.Samples.Parties
         async void OnLeaveLobby()
         {
             await RemoveFromParty(m_LocalPlayer.Id);
-            m_NotificationStackView.CreateNotification(1,
-                "You", "left the Party!");
+            NotificationEvents.onNotify?.Invoke(
+                new NotificationData(
+                    "You", "Left the Party!", 1));
+
             //Leave Lobby Regardless of result
             OnLeftParty();
         }
@@ -264,15 +265,14 @@ namespace Unity.Services.Samples.Parties
                 foreach (var player in changes.PlayerLeft.Value)
                 {
                     var leftPlayer = new LobbyPlayer(m_PartyLobby.Players[player]);
-                    m_NotificationStackView.CreateNotification(1,
-                        leftPlayer.Name,
-                        "Left the Party!");
+                    NotificationEvents.onNotify?.Invoke(
+                        new NotificationData(leftPlayer.Name, "Left the Party!", 1));
                 }
+
+                changes.ApplyToLobby(m_PartyLobby);
+
+                UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
             }
-
-            changes.ApplyToLobby(m_PartyLobby);
-
-            UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
         }
 
         void AllMembersReady(List<LobbyPlayer> members)
@@ -282,12 +282,9 @@ namespace Unity.Services.Samples.Parties
 
         void OnKickedFromParty()
         {
-            m_NotificationStackView.CreateNotification(1,
-                m_LocalPlayer.Name,
-                "You were removed from the Party!");
-            Debug.Log($"Removed from party!");
+            NotificationEvents.onNotify?.Invoke(
+                new NotificationData(m_LocalPlayer.Name, "Removed from the Party!", 1));
             OnLeftParty();
-
         }
 
         async void OnReadyClicked(bool ready)
