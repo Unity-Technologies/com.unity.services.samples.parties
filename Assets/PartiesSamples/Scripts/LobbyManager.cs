@@ -39,13 +39,13 @@ namespace Unity.Services.Samples.Parties
         /// <summary>
         /// If you are already Authenticating somewhere else, this step can be skipped.
         /// </summary>
-        async Task Authenticate(string playerName)
+        async Task Authenticate(string profileName)
         {
             //We can test locally out-of the box with one Editor and one Build.
             //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
             // per instance.
             var initOptions = new InitializationOptions();
-            initOptions.SetProfile(playerName);
+            initOptions.SetProfile(profileName);
 
             await UnityServices.InitializeAsync(initOptions);
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
@@ -113,7 +113,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.LogError(e);
+                PopUpLobbyError(e);
             }
         }
 
@@ -133,7 +133,6 @@ namespace Unity.Services.Samples.Parties
             {
                 var joinFailMessage = $"{e.Reason}, {e.Message}";
                 m_LobbyJoinPopupPopupView.JoinPartyFailed(joinFailMessage);
-                Debug.LogError(e);
             }
         }
 
@@ -145,7 +144,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.LogError(e);
+                PopUpLobbyError(e);
             }
         }
 
@@ -163,7 +162,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.LogError(e);
+                PopUpLobbyError(e);
             }
         }
 
@@ -178,8 +177,14 @@ namespace Unity.Services.Samples.Parties
             m_PartyEventCallbacks.LobbyChanged += OnLobbyChanged;
             m_PartyEventCallbacks.LobbyEventConnectionStateChanged += OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby += OnKickedFromParty;
-
-            await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
+            try
+            {
+                await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
+            }
+            catch (LobbyServiceException e)
+            {
+                PopUpLobbyError(e);
+            }
         }
 
         async void OnLeaveLobby()
@@ -243,10 +248,10 @@ namespace Unity.Services.Samples.Parties
             await TrySetHost(playerId);
         }
 
-        async void OnNameChanged(string name)
+        async void OnNameChanged(string newName)
         {
-            m_LocalPlayer.SetName(name);
-            PlayerPrefs.SetString(LobbyPlayer.nameKey, name);
+            m_LocalPlayer.SetName(newName);
+            PlayerPrefs.SetString(LobbyPlayer.nameKey, newName);
 
             await UpdateLocalPlayer();
         }
@@ -303,8 +308,14 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                Debug.Log(e);
+                PopUpLobbyError(e);
             }
+        }
+
+        void PopUpLobbyError(LobbyServiceException e)
+        {
+            var error = $"{e.Reason} : {e.Message}";
+            PopUpEvents.Show?.Invoke(error);
         }
     }
 }
