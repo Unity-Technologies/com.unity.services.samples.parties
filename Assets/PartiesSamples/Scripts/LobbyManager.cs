@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Samples.UI;
@@ -30,6 +29,7 @@ namespace Unity.Services.Samples.Parties
 
         async void Start()
         {
+            m_PlayerProfileName = LoadPlayerName();
             await Authenticate(m_PlayerProfileName);
             CreateLocalPlayer(m_PlayerProfileName);
             UIInit();
@@ -211,6 +211,7 @@ namespace Unity.Services.Samples.Parties
             m_LobbyJoinCreateView.Show();
             m_LobbyView.LeftParty();
             m_LobbyListView.Hide();
+            m_PartyLobby = null;
         }
 
         void UpdatePlayers(List<Player> players, string hostID)
@@ -252,8 +253,8 @@ namespace Unity.Services.Samples.Parties
         {
             m_LocalPlayer.SetName(newName);
             PlayerPrefs.SetString(LobbyPlayer.nameKey, newName);
-
-            await UpdateLocalPlayer();
+            if(m_PartyLobby!=null)
+                await UpdateLocalPlayer();
         }
 
         void OnLobbyChanged(ILobbyChanges changes)
@@ -264,6 +265,7 @@ namespace Unity.Services.Samples.Parties
                 return;
             }
 
+
             //We have to get the player data before we apply the Data to our local Lobby
             if (changes.PlayerLeft.Changed)
             {
@@ -273,11 +275,10 @@ namespace Unity.Services.Samples.Parties
                     NotificationEvents.onNotify?.Invoke(
                         new NotificationData(leftPlayer.Name, "Left the Party!", 1));
                 }
-
-                changes.ApplyToLobby(m_PartyLobby);
-
-                UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
             }
+            changes.ApplyToLobby(m_PartyLobby);
+
+            UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
         }
 
         void AllMembersReady(List<LobbyPlayer> members)
