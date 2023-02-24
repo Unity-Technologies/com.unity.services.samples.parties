@@ -131,7 +131,7 @@ namespace Unity.Services.Samples.Parties
             }
             catch (LobbyServiceException e)
             {
-                var joinFailMessage = $"{e.Reason}, {e.Message}";
+                var joinFailMessage = FormatLobbyError(e);
                 m_LobbyJoinPopupPopupView.JoinPartyFailed(joinFailMessage);
             }
         }
@@ -253,7 +253,7 @@ namespace Unity.Services.Samples.Parties
         {
             m_LocalPlayer.SetName(newName);
             PlayerPrefs.SetString(LobbyPlayer.nameKey, newName);
-            if(m_PartyLobby!=null)
+            if (m_PartyLobby != null)
                 await UpdateLocalPlayer();
         }
 
@@ -265,7 +265,6 @@ namespace Unity.Services.Samples.Parties
                 return;
             }
 
-
             //We have to get the player data before we apply the Data to our local Lobby
             if (changes.PlayerLeft.Changed)
             {
@@ -276,6 +275,7 @@ namespace Unity.Services.Samples.Parties
                         new NotificationData(leftPlayer.Name, "Left the Party!", 1));
                 }
             }
+
             changes.ApplyToLobby(m_PartyLobby);
 
             UpdatePlayers(m_PartyLobby.Players, m_PartyLobby.HostId);
@@ -313,9 +313,14 @@ namespace Unity.Services.Samples.Parties
             }
         }
 
+        string FormatLobbyError(LobbyServiceException e)
+        {
+            return $"{e.Reason}({e.ErrorCode}) :\n {e.Message}";
+        }
+
         void PopUpLobbyError(LobbyServiceException e)
         {
-            var error = $"{e.Reason} : {e.Message}";
+            var error = FormatLobbyError(e);
             PopUpEvents.Show?.Invoke(error);
         }
     }
