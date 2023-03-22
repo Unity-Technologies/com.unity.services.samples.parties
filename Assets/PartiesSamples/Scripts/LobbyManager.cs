@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Samples.UI;
-using Unity.Services.Authentication;
-using Unity.Services.Core;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -26,6 +24,7 @@ namespace Unity.Services.Samples.Parties
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
         LobbyEventCallbacks m_PartyEventCallbacks;
+        PlayerAuthentication m_PlayerAuthentication;
 
         async void Start()
         {
@@ -41,14 +40,12 @@ namespace Unity.Services.Samples.Parties
         /// </summary>
         async Task Authenticate(string profileName)
         {
+            m_PlayerAuthentication = new PlayerAuthentication();
+
             //We can test locally out-of the box with one Editor and one Build.
             //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
             // per instance.
-            var initOptions = new InitializationOptions();
-            initOptions.SetProfile(profileName);
-
-            await UnityServices.InitializeAsync(initOptions);
-            await AuthenticationService.Instance.SignInAnonymouslyAsync();
+            await m_PlayerAuthentication.SignIn();
         }
 
         string LoadPlayerName()
@@ -67,7 +64,7 @@ namespace Unity.Services.Samples.Parties
 
         void CreateLocalLobbyPlayer(string playerName)
         {
-            var id = AuthenticationService.Instance.PlayerId;
+            var id = PlayerAuthentication.PlayerId;
             m_LocalPlayer = new LobbyPlayer(id, playerName, true);
         }
 
@@ -105,7 +102,7 @@ namespace Unity.Services.Samples.Parties
                     IsPrivate = true,
                     Player = m_LocalPlayer
                 };
-                var partyLobbyName = $"{k_PartyNamePrefix}_{AuthenticationService.Instance.PlayerId}";
+                var partyLobbyName = $"{k_PartyNamePrefix}_{PlayerAuthentication.PlayerId}";
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
                     m_MaxPartyMembers,
                     partyLobbyOptions);
