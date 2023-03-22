@@ -31,7 +31,7 @@ namespace Unity.Services.Samples.Parties
         {
             m_PlayerProfileName = LoadPlayerName();
             await Authenticate(m_PlayerProfileName);
-            CreateLocalPlayer(m_PlayerProfileName);
+            CreateLocalLobbyPlayer(m_PlayerProfileName);
             UIInit();
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
@@ -65,7 +65,7 @@ namespace Unity.Services.Samples.Parties
             return playerName;
         }
 
-        void CreateLocalPlayer(string playerName)
+        void CreateLocalLobbyPlayer(string playerName)
         {
             var id = AuthenticationService.Instance.PlayerId;
             m_LocalPlayer = new LobbyPlayer(id, playerName, true);
