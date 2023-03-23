@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using UnityEngine;
+using UnityEngine.PlayerLoop;
 
 namespace Unity.Services.Samples
 {
@@ -10,12 +11,18 @@ namespace Unity.Services.Samples
     /// The Samples Plugins implementation of the Unity Authentication Service
     /// Using this ensures we don't log in multiple times when combining samples.
     /// </summary>
-    public class PlayerAuthentication
+
+    [CreateAssetMenu(order = 0, fileName = "New PlayerAuth_SO", menuName = "UGS/Samples/PlayerAuth_SO")]
+    public class PlayerAuthentication : ScriptableObject
     {
         [field: SerializeField] public PlayerProfile LocalPlayer { get; private set; }
 
+        IPlayerProfileService m_PlayerProfileService;
+        bool m_SigningIn = false;
         public async Task Init(string profileName = null)
         {
+            if (IsInitialized)
+                return;
             if (profileName != null)
             {
                 //ProfileNames can't contain non-alphanumeric characters
@@ -28,23 +35,26 @@ namespace Unity.Services.Samples
             }
             else
                 await UnityServices.InitializeAsync();
+
+            m_PlayerProfileService = new SamplePlayerProfileService();
         }
 
         public async Task SignIn(string profileName = null)
         {
-            if (IsSignedIn)
-                return;
             await Init(profileName);
+            if (IsSignedIn || m_SigningIn)
+                return;
+            m_SigningIn = true;
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
-            var playerName = profileName ?? "default";
             var playerID = AuthenticationService.Instance.PlayerId;
+            LocalPlayer = new PlayerProfile(m_PlayerProfileService.GetName(playerID),playerID);
 
-            LocalPlayer = new PlayerProfile(playerName, playerID);
+            m_SigningIn = false;
             Debug.Log($"[Auth] Signed into Unity Services as {LocalPlayer}");
         }
 
-        public static bool IsSignedIn => UnityServices.State != ServicesInitializationState.Uninitialized && AuthenticationService.Instance.IsSignedIn;
-        public static string PlayerId => IsSignedIn ? AuthenticationService.Instance.PlayerId : null;
+        public bool IsInitialized => UnityServices.State == ServicesInitializationState.Initialized;
+        public bool IsSignedIn => IsInitialized && AuthenticationService.Instance.IsSignedIn ;
     }
 }

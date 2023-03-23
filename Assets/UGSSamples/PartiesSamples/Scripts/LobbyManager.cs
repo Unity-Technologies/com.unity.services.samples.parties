@@ -16,57 +16,23 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] LobbyView m_LobbyView;
         [SerializeField] LobbyListView m_LobbyListView;
         [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
-        [SerializeField] NameChangeView m_NameChangeView;
-        [SerializeField] string m_PlayerProfileName = "NewPlayer";
         [SerializeField] int m_MaxPartyMembers = 4;
-        const string k_PartyNamePrefix = "Party";
+        [SerializeField] PlayerAuthentication m_PlayerAuthentication;
+        const string k_LobbyNamePrefix = "Party";
 
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
         LobbyEventCallbacks m_PartyEventCallbacks;
-        PlayerAuthentication m_PlayerAuthentication;
+
 
         async void Start()
         {
-            m_PlayerProfileName = LoadPlayerName();
-            await Authenticate(m_PlayerProfileName);
-            CreateLocalLobbyPlayer(m_PlayerProfileName);
+            await m_PlayerAuthentication.SignIn();
+            m_LocalPlayer = new LobbyPlayer(m_PlayerAuthentication.LocalPlayer.Id, m_PlayerAuthentication.LocalPlayer.Name, true);
             UIInit();
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
 
-        /// <summary>
-        /// If you are already Authenticating somewhere else, this step can be skipped.
-        /// </summary>
-        async Task Authenticate(string profileName)
-        {
-            m_PlayerAuthentication = new PlayerAuthentication();
-
-            //We can test locally out-of the box with one Editor and one Build.
-            //Using things like ParrelSync, or multiple build from the same machine, requires unique InitializationOptions
-            // per instance.
-            await m_PlayerAuthentication.SignIn();
-        }
-
-        string LoadPlayerName()
-        {
-            string playerName;
-            if (PlayerPrefs.HasKey(LobbyPlayer.nameKey))
-                playerName = PlayerPrefs.GetString(LobbyPlayer.nameKey);
-            else
-            {
-                playerName = m_PlayerProfileName;
-                PlayerPrefs.SetString(LobbyPlayer.nameKey, playerName);
-            }
-
-            return playerName;
-        }
-
-        void CreateLocalLobbyPlayer(string playerName)
-        {
-            var id = PlayerAuthentication.PlayerId;
-            m_LocalPlayer = new LobbyPlayer(id, playerName, true);
-        }
 
         void UIInit()
         {
@@ -88,9 +54,6 @@ namespace Unity.Services.Samples.Parties
             m_LobbyListView.Init(m_MaxPartyMembers);
             m_LobbyListView.OnKickClicked += OnKickFromLobby;
             m_LobbyListView.OnHostClicked += OnSetHost;
-
-            m_NameChangeView.Init(LoadPlayerName());
-            m_NameChangeView.OnNameChanged += OnNameChanged;
         }
 
         async void CreateLobby()
@@ -102,7 +65,7 @@ namespace Unity.Services.Samples.Parties
                     IsPrivate = true,
                     Player = m_LocalPlayer
                 };
-                var partyLobbyName = $"{k_PartyNamePrefix}_{PlayerAuthentication.PlayerId}";
+                var partyLobbyName = $"{k_LobbyNamePrefix}_{m_PlayerAuthentication.LocalPlayer.Id}";
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
                     m_MaxPartyMembers,
                     partyLobbyOptions);

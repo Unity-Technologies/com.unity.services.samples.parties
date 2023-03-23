@@ -121,9 +121,8 @@ MonoBehaviour:
   m_LobbyView: {fileID: 3136909830984599707}
   m_LobbyListView: {fileID: 2346433896486384294}
   m_LobbyJoinPopupPopupView: {fileID: 5266334136655094806}
-  m_NameChangeView: {fileID: 7412401237997886833}
-  m_PlayerProfileName: NewPlayer
   m_MaxPartyMembers: 4
+  m_PlayerAuthentication: {fileID: 11400000, guid: 5902fa4c5626f41bb94a25665d910e98, type: 2}
 --- !u!1001 &3433835832891883496
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -485,17 +484,6 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 2602169069909335744, guid: eaf6e268286ab4e4ead4f0a6729a9331, type: 3}
   m_PrefabInstance: {fileID: 3598966368498458204}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7412401237997886833 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6281460998321341229, guid: eaf6e268286ab4e4ead4f0a6729a9331, type: 3}
-  m_PrefabInstance: {fileID: 3598966368498458204}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fda00fffa538b4140b03e8030ff2dbe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &3731640582354956023
 PrefabInstance:
   m_ObjectHideFlags: 0
