@@ -285,7 +285,7 @@ namespace Unity.Services.Samples.Parties
         void PopUpLobbyError(LobbyServiceException e)
         {
             var error = FormatLobbyError(e);
-            PopUpEvents.Show?.Invoke(error);
+            PopUpEvents.ShowPopup(error, "OK");
         }
     }
 }
