@@ -18,21 +18,22 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
         [SerializeField] int m_MaxPartyMembers = 4;
         [SerializeField] PlayerAuthentication m_PlayerAuthentication;
-        const string k_LobbyNamePrefix = "Party";
+        const string k_LobbyNamePrefix = "Lobby";
 
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
         LobbyEventCallbacks m_PartyEventCallbacks;
 
-
         async void Start()
         {
             await m_PlayerAuthentication.SignIn();
-            m_LocalPlayer = new LobbyPlayer(m_PlayerAuthentication.LocalPlayer.Id, m_PlayerAuthentication.LocalPlayer.Name, true);
+            m_LocalPlayer = new LobbyPlayer(m_PlayerAuthentication.LocalPlayer.Id,
+                m_PlayerAuthentication.LocalPlayer.Name, true);
             UIInit();
+
+            LobbyEvents.RequestJoinLobby += TryLobbyJoin;
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
-
 
         void UIInit()
         {
@@ -69,7 +70,7 @@ namespace Unity.Services.Samples.Parties
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
                     m_MaxPartyMembers,
                     partyLobbyOptions);
-                await OnJoinedParty(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -87,7 +88,7 @@ namespace Unity.Services.Samples.Parties
                 };
 
                 m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, joinOptions);
-                await OnJoinedParty(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -126,9 +127,9 @@ namespace Unity.Services.Samples.Parties
             }
         }
 
-        async Task OnJoinedParty(Lobby lobby)
+        async Task OnJoinedLobby(Lobby lobby)
         {
-            m_LobbyView.JoinParty(lobby.LobbyCode);
+            m_LobbyView.Join(lobby.LobbyCode);
             m_LobbyJoinCreateView.Hide();
             m_LobbyJoinPopupPopupView.Hide();
             m_LobbyListView.Show();
@@ -137,6 +138,7 @@ namespace Unity.Services.Samples.Parties
             m_PartyEventCallbacks.LobbyChanged += OnLobbyChanged;
             m_PartyEventCallbacks.LobbyEventConnectionStateChanged += OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby += OnKickedFromParty;
+            LobbyEvents.OnLobbyJoined?.Invoke(lobby.LobbyCode);
             try
             {
                 await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
@@ -155,7 +157,7 @@ namespace Unity.Services.Samples.Parties
                     "You", "Left the Party!", 1));
 
             //Leave Lobby Regardless of result
-            OnLeftParty();
+            OnLeftLobby();
         }
 
         void OnLobbyConnectionChanged(LobbyEventConnectionState state)
@@ -163,14 +165,16 @@ namespace Unity.Services.Samples.Parties
             Debug.Log($"LobbyConnection Changed to {state}");
         }
 
-        void OnLeftParty()
+        void OnLeftLobby()
         {
             m_PartyEventCallbacks.LobbyChanged -= OnLobbyChanged;
             m_PartyEventCallbacks.LobbyEventConnectionStateChanged -= OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby -= OnKickedFromParty;
             m_LobbyJoinCreateView.Show();
-            m_LobbyView.LeftParty();
+            m_LobbyView.Leave();
             m_LobbyListView.Hide();
+            LobbyEvents.OnLobbyLeft?.Invoke();
+
             m_PartyLobby = null;
         }
 
@@ -221,7 +225,7 @@ namespace Unity.Services.Samples.Parties
         {
             if (changes.LobbyDeleted)
             {
-                OnLeftParty();
+                OnLeftLobby();
                 return;
             }
 
@@ -250,7 +254,7 @@ namespace Unity.Services.Samples.Parties
         {
             NotificationEvents.onNotify?.Invoke(
                 new NotificationData(m_LocalPlayer.Name, "Removed from the Party!", 1));
-            OnLeftParty();
+            OnLeftLobby();
         }
 
         async void OnReadyClicked(bool ready)

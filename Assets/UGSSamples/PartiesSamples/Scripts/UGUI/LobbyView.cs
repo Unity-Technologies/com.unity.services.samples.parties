@@ -29,14 +29,14 @@ namespace Unity.Services.Samples.Parties
             m_CancelButton.onClick.AddListener(OnUnready);
         }
 
-        public void JoinParty(string partyCode)
+        public void Join(string partyCode)
         {
             m_InGameJoinCode.text = partyCode;
             gameObject.SetActive(true);
             m_ButtonPanel.gameObject.SetActive(true);
         }
 
-        public void LeftParty()
+        public void Leave()
         {
             gameObject.SetActive(false);
             m_ButtonPanel.gameObject.SetActive(false);

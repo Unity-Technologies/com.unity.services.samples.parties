@@ -153,6 +153,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -205
       objectReference: {fileID: 0}
+    - target: {fileID: 602051157904410379, guid: 43fefccb0b6b1f74d80f555f5c9f1387, type: 3}
+      propertyPath: m_Name
+      value: PartyJoinCreateView
+      objectReference: {fileID: 0}
     - target: {fileID: 798206988532688457, guid: 43fefccb0b6b1f74d80f555f5c9f1387, type: 3}
       propertyPath: m_IsActive
       value: 0
