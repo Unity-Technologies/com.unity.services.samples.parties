@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Samples.UI;
+using Unity.Services.Authentication;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -17,18 +18,21 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] LobbyListView m_LobbyListView;
         [SerializeField] LobbyJoinPopupView m_LobbyJoinPopupPopupView;
         [SerializeField] int m_MaxPartyMembers = 4;
-        [SerializeField] PlayerAuthentication m_PlayerAuthentication;
         const string k_LobbyNamePrefix = "Party";
 
         Lobby m_PartyLobby;
         LobbyPlayer m_LocalPlayer;
         LobbyEventCallbacks m_PartyEventCallbacks;
-
+        SamplePlayerProfileService m_SamplePlayerProfileService;
 
         async void Start()
         {
-            await m_PlayerAuthentication.SignIn();
-            m_LocalPlayer = new LobbyPlayer(m_PlayerAuthentication.LocalPlayer.Id, m_PlayerAuthentication.LocalPlayer.Name, true);
+            await SampleAuthenticator.SignIn();
+            m_SamplePlayerProfileService = new SamplePlayerProfileService();
+            var playerID = AuthenticationService.Instance.PlayerId;
+            var player = new Player(playerID);
+            m_LocalPlayer = new LobbyPlayer(player);
+            m_LocalPlayer.SetName(m_SamplePlayerProfileService.GetName(playerID));
             UIInit();
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
@@ -65,7 +69,7 @@ namespace Unity.Services.Samples.Parties
                     IsPrivate = true,
                     Player = m_LocalPlayer
                 };
-                var partyLobbyName = $"{k_LobbyNamePrefix}_{m_PlayerAuthentication.LocalPlayer.Id}";
+                var partyLobbyName = $"{k_LobbyNamePrefix}_{m_LocalPlayer.Id}";
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
                     m_MaxPartyMembers,
                     partyLobbyOptions);
