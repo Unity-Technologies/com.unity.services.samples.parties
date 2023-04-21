@@ -92,11 +92,11 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 18
+  m_fontSize: 10
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1
-  m_fontSizeMin: 18
+  m_fontSizeMin: 10
   m_fontSizeMax: 45
   m_fontStyle: 1
   m_HorizontalAlignment: 2
@@ -222,7 +222,7 @@ GameObject:
   - component: {fileID: 5091275453225277143}
   - component: {fileID: 6582720852573404289}
   m_Layer: 5
-  m_Name: PartyEntryButton
+  m_Name: EntryButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
-    public class PartyView : MonoBehaviour
+    public class LobbyView : MonoBehaviour
     {
         public event Action<bool> OnReadyClicked;
         public event Action OnLeaveClicked;

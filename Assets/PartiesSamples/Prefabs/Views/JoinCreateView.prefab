@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 563219012282490154}
   - component: {fileID: 7595485870053130663}
   m_Layer: 5
-  m_Name: JoinCreateViews
+  m_Name: JoinCreateView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

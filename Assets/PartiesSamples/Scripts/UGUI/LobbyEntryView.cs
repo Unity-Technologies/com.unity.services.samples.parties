@@ -5,9 +5,11 @@ using UnityEngine.UI;
 
 namespace Unity.Services.Samples.Parties
 {
-    public class PartyEntryView : MonoBehaviour
+    public class LobbyEntryView : MonoBehaviour
     {
         public Action OnKickClicked;
+        public Action OnHostClicked;
+        [field: SerializeField] public RectTransform RectTransform { get; private set; }
         [SerializeField] GameObject m_EmptyPartyContentPanel;
         [SerializeField] GameObject m_PlayerContentPanel;
         [SerializeField] GameObject m_NotReadyTextPanel;
@@ -16,15 +18,19 @@ namespace Unity.Services.Samples.Parties
         [SerializeField] GameObject m_HostCrown;
         [SerializeField] TMP_Text m_NameText;
         [SerializeField] Button m_KickButton;
+        [SerializeField] Button m_HostButton;
 
+
+        Rect m_EntryRect;
         public void Init()
         {
             m_KickButton.onClick.AddListener(() => OnKickClicked?.Invoke());
+            m_HostButton.onClick.AddListener(() => OnHostClicked?.Invoke());
             SetEmpty();
         }
 
         //We only refresh active players,
-        public void Refresh(PartyPlayer playerData, bool imHost)
+        public void Refresh(LobbyPlayer playerData, bool imHost)
         {
             m_NameText.text = playerData.Name;
             ShowPlayer(true);
@@ -32,7 +38,9 @@ namespace Unity.Services.Samples.Parties
             m_HostCrown.SetActive(playerData.IsHost);
 
             if (imHost && !playerData.IsLocalPlayer)
+            {
                 m_ButtonPanel.SetActive(true);
+            }
         }
 
         public void SetEmpty()
@@ -55,6 +63,5 @@ namespace Unity.Services.Samples.Parties
             m_ReadyPanelText.SetActive(isReady);
             m_NotReadyTextPanel.SetActive(!isReady);
         }
-
     }
 }
