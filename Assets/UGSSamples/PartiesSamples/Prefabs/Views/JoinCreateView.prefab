@@ -82,7 +82,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b0501d65da5545f3a2b91a34d5af652, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_JoinCreateView: {fileID: 4325594047439635545}
   m_JoinButton: {fileID: 7003399361482422630}
   m_CreateButton: {fileID: 5110273078864118305}
 --- !u!1 &5117761327342504289
@@ -385,6 +384,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3834607274608167095, guid: 4da4cd94e6af24752980d889ff1c7568, type: 3}
+      propertyPath: m_text
+      value: Create
+      objectReference: {fileID: 0}
+    - target: {fileID: 3834607274608167095, guid: 4da4cd94e6af24752980d889ff1c7568, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+    - target: {fileID: 3834607274608167095, guid: 4da4cd94e6af24752980d889ff1c7568, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
     - target: {fileID: 6582720852573404289, guid: 4da4cd94e6af24752980d889ff1c7568, type: 3}
       propertyPath: m_Transition
       value: 1

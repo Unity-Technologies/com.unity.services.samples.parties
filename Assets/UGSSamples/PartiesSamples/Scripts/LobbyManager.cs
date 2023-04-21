@@ -34,9 +34,10 @@ namespace Unity.Services.Samples.Parties
             m_LocalPlayer = new LobbyPlayer(player);
             m_LocalPlayer.SetName(m_SamplePlayerProfileService.GetName(playerID));
             UIInit();
+
+            LobbyEvents.RequestJoinLobby += TryLobbyJoin;
             m_PartyEventCallbacks = new LobbyEventCallbacks();
         }
-
 
         void UIInit()
         {
@@ -73,7 +74,7 @@ namespace Unity.Services.Samples.Parties
                 m_PartyLobby = await LobbyService.Instance.CreateLobbyAsync(partyLobbyName,
                     m_MaxPartyMembers,
                     partyLobbyOptions);
-                await OnJoinedParty(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -91,7 +92,7 @@ namespace Unity.Services.Samples.Parties
                 };
 
                 m_PartyLobby = await LobbyService.Instance.JoinLobbyByCodeAsync(joinCode, joinOptions);
-                await OnJoinedParty(m_PartyLobby);
+                await OnJoinedLobby(m_PartyLobby);
             }
             catch (LobbyServiceException e)
             {
@@ -130,9 +131,9 @@ namespace Unity.Services.Samples.Parties
             }
         }
 
-        async Task OnJoinedParty(Lobby lobby)
+        async Task OnJoinedLobby(Lobby lobby)
         {
-            m_LobbyView.JoinParty(lobby.LobbyCode);
+            m_LobbyView.Join(lobby.LobbyCode);
             m_LobbyJoinCreateView.Hide();
             m_LobbyJoinPopupPopupView.Hide();
             m_LobbyListView.Show();
@@ -141,6 +142,7 @@ namespace Unity.Services.Samples.Parties
             m_PartyEventCallbacks.LobbyChanged += OnLobbyChanged;
             m_PartyEventCallbacks.LobbyEventConnectionStateChanged += OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby += OnKickedFromParty;
+            LobbyEvents.OnLobbyJoined?.Invoke(lobby.LobbyCode);
             try
             {
                 await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobby.Id, m_PartyEventCallbacks);
@@ -159,7 +161,7 @@ namespace Unity.Services.Samples.Parties
                     "You", "Left the Party!", 1));
 
             //Leave Lobby Regardless of result
-            OnLeftParty();
+            OnLeftLobby();
         }
 
         void OnLobbyConnectionChanged(LobbyEventConnectionState state)
@@ -167,14 +169,16 @@ namespace Unity.Services.Samples.Parties
             Debug.Log($"LobbyConnection Changed to {state}");
         }
 
-        void OnLeftParty()
+        void OnLeftLobby()
         {
             m_PartyEventCallbacks.LobbyChanged -= OnLobbyChanged;
             m_PartyEventCallbacks.LobbyEventConnectionStateChanged -= OnLobbyConnectionChanged;
             m_PartyEventCallbacks.KickedFromLobby -= OnKickedFromParty;
             m_LobbyJoinCreateView.Show();
-            m_LobbyView.LeftParty();
+            m_LobbyView.Leave();
             m_LobbyListView.Hide();
+            LobbyEvents.OnLobbyLeft?.Invoke();
+
             m_PartyLobby = null;
         }
 
@@ -225,7 +229,7 @@ namespace Unity.Services.Samples.Parties
         {
             if (changes.LobbyDeleted)
             {
-                OnLeftParty();
+                OnLeftLobby();
                 return;
             }
 
@@ -254,7 +258,7 @@ namespace Unity.Services.Samples.Parties
         {
             NotificationEvents.onNotify?.Invoke(
                 new NotificationData(m_LocalPlayer.Name, "Removed from the Party!", 1));
-            OnLeftParty();
+            OnLeftLobby();
         }
 
         async void OnReadyClicked(bool ready)
@@ -285,7 +289,7 @@ namespace Unity.Services.Samples.Parties
         void PopUpLobbyError(LobbyServiceException e)
         {
             var error = FormatLobbyError(e);
-            PopUpEvents.Show?.Invoke(error);
+            PopUpEvents.ShowPopup(error, "OK");
         }
     }
 }
