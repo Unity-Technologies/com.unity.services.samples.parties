@@ -1,0 +1,20 @@
+{
+    "name": "Unity.Services.Samples.Parties",
+    "rootNamespace": "",
+    "references": [
+        "Unity.Services.Samples",
+        "Unity.Services.Lobbies",
+        "Unity.Services.Core",
+        "Unity.TextMeshPro",
+        "Unity.Services.Authentication"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
