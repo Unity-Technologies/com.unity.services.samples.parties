@@ -690,11 +690,11 @@ PlayerSettings:
     m_VersionName: 
   apiCompatibilityLevel: 6
   activeInputHandler: 0
-  cloudProjectId: 89e7628f-9243-4a16-ac80-25bc471c1c52
+  cloudProjectId: 60bec043-990d-44da-a33e-d6d53eef538a
   framebufferDepthMemorylessMode: 0
   qualitySettingsNames: []
-  projectName: party-sample
-  organizationId: operate-samples
+  projectName: Parties Sample
+  organizationId: ugs-samples
   cloudEnabled: 0
   legacyClampBlendShapeWeights: 0
   virtualTexturingSupportEnabled: 0
