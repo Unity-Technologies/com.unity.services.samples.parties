@@ -1000,6 +1000,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1310185900453206929}
     m_Modifications:
+    - target: {fileID: 1093372967731139795, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1093372967731139795, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 04dfae0ba81594c639f49674f91ae512, type: 3}
     - target: {fileID: 2343128413502425157, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_Name
       value: ReadyButton
@@ -1125,6 +1133,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1310185900453206929}
     m_Modifications:
+    - target: {fileID: 1093372967731139795, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
+      propertyPath: m_Type
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1093372967731139795, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 04dfae0ba81594c639f49674f91ae512, type: 3}
     - target: {fileID: 1093372967731139795, guid: 7e8b4c435369ffd42b906b3816a9a075, type: 3}
       propertyPath: m_Color.b
       value: 1
